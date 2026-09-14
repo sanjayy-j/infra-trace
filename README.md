@@ -10,11 +10,27 @@ layers over it; remove them and every capability below still works from a MySQL
 prompt.
 
 ```
-Payment DB  ←  Payment Service  ←  Order Service  ←  API Gateway
-   hop 0          hop 1              hop 2            hop 3
+        real software infrastructure
+                    |
+      normalised relational database        <-- the project
+                    |
+    dependency graph as a relation (self-referencing M:N)
+                    |
+         SQL analysis, incl. recursive CTEs
+                    |
+   impact  .  ownership  .  incident intelligence
+                    |
+          optional REST API + dashboard      <-- thin layers
 ```
 
-<sub>That chain is produced by a recursive SQL query, not by application code.</sub>
+Everything above the dashed line is SQL. For example, this chain:
+
+```
+Payment DB  <-  Payment Service  <-  Order Service  <-  API Gateway
+   hop 0           hop 1               hop 2             hop 3
+```
+
+is produced by a recursive SQL query, not by application code.
 
 ---
 
@@ -31,7 +47,8 @@ Payment DB  ←  Payment Service  ←  Order Service  ←  API Gateway
 16. [Frontend](#16-frontend) · 17. [Setup](#17-setup) · 18. [Testing](#18-testing) ·
 19. [Example queries](#19-example-queries) · 20. [Demo walkthrough](#20-demo-walkthrough) ·
 21. [Limitations](#21-limitations) · 22. [Future scope](#22-future-scope) ·
-23. [Project structure](#23-project-structure) · 24. [Team contribution](#24-team-contribution)
+23. [Project structure](#23-project-structure) · 24. [Team contribution](#24-team-contribution) ·
+25. [License](#25-license)
 
 ---
 
@@ -264,12 +281,17 @@ depth.
 > The caveat is returned in the API payload and shown on the dashboard, so it
 > cannot be lost downstream. Query R7 takes the first step towards refining it.
 
-**On cycle prevention specifically.** Cycle prevention covers cycles of any length up to the configured recursive CTE recursion limit (MySQL's `cte_max_recursion_depth`, default 1000) - not literally unlimited. The recursion uses `UNION`,
-which de-duplicates, so it terminates after at most N steps for N components and
-the limit is a safety net rather than the stopping condition. With the default
-of 1000 this covers any estate of fewer than 1000 components. An audit found an
-earlier 50-hop bound silently accepting a 60-node cycle;
-`tests/sql/06_cycle_regression.sql` now guards against that returning.
+**On cycle prevention specifically.** Cycles are rejected at any length *up to
+the configured recursion limit* — MySQL's `cte_max_recursion_depth`, which
+defaults to 1000. That is not literally unlimited, and the documentation says so
+rather than claiming more. The traversal uses `UNION`, which de-duplicates, so
+it terminates after at most N steps for N components; the limit is a safety net,
+not the stopping condition. With the default it covers any estate of fewer than
+1000 components.
+
+An audit found an earlier 50-hop bound silently accepting a 60-node cycle.
+[`tests/sql/06_cycle_regression.sql`](tests/sql/06_cycle_regression.sql) now
+builds that exact scenario and guards against it returning.
 
 ## 13. Transactions & Concurrency
 
@@ -639,14 +661,27 @@ that demonstrates it.
 
 ## 24. Team Contribution
 
-| Name | Registration | Contribution |
+> **TODO before submission** — the names and registration numbers below are
+> placeholders. The work areas are listed so they can be assigned; fill in the
+> first two columns before handing this in.
+
+| Name | Registration number | Work area |
 |---|---|---|
-| *(fill in)* | | Schema design, normalisation, constraints |
-| *(fill in)* | | Analytical SQL, recursive queries, blast radius |
-| *(fill in)* | | Stored programs, triggers, transactions |
-| *(fill in)* | | Backend API, dashboard, testing |
-| *(fill in)* | | Documentation, performance study |
+| *TODO* | *TODO* | Schema design, normalisation, constraints |
+| *TODO* | *TODO* | Analytical SQL, recursive queries, blast radius |
+| *TODO* | *TODO* | Stored programs, triggers, transactions |
+| *TODO* | *TODO* | Backend API, dashboard, testing |
+| *TODO* | *TODO* | Documentation, performance study |
+
+## 25. License
+
+Released under the **MIT License** — see [`LICENSE`](LICENSE).
+
+The ShopSphere dataset is fictional. Company, team, service and incident names
+were invented for this project and do not describe any real organisation or
+system.
 
 ---
 
 **Course:** Database Management Systems · **DBMS:** MySQL 8.0.46 (InnoDB)
+**Verified on:** Windows 11 (native MySQL 8.0.46) and Linux (MySQL 8.0.46 container)

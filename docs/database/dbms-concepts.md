@@ -29,6 +29,37 @@ the thing relational databases are bad at — is represented entirely inside the
 relational model, as a relation over two foreign keys, and is then queried with
 standard SQL.
 
+### Keys — the vocabulary the rest of this document uses
+
+The normalisation argument in sections 3 and 4 depends on these terms, so they
+are defined here with a concrete example from this schema.
+
+| Term | Meaning | In InfraTrace |
+|---|---|---|
+| **Superkey** | Any set of attributes that uniquely identifies a row. | `{component_id}`, and also `{component_id, criticality}` — still unique, just not minimal |
+| **Candidate key** | A *minimal* superkey: remove any attribute and it stops being unique. | `component` has two: `{component_id}` and `{component_name}` |
+| **Primary key** | The candidate key chosen as the row's identity. | `component_id` |
+| **Alternate key** | A candidate key not chosen as primary; enforced with `UNIQUE`. | `component_name` (`uq_component_name`) |
+| **Composite key** | A key made of more than one attribute. | `incident_component(incident_id, component_id)` |
+| **Surrogate key** | A system-generated identifier with no business meaning. | `component_id`, `dependency_id` |
+| **Natural key** | A key made of real-world attributes. | `dependency(component_id, depends_on_id)`; `deployment(component_id, environment_id, deployed_at)` |
+| **Foreign key** | An attribute referencing a candidate key of another relation. | `component.owner_team_id` → `team.team_id` |
+
+Two choices in this schema are worth explaining rather than just listing.
+
+**Why `dependency` has both a surrogate and a natural key.** The natural key is
+the pair `(component_id, depends_on_id)` — an edge is fully identified by its two
+endpoints, and `uq_dependency_edge` enforces that. A surrogate `dependency_id` is
+*also* kept as the primary key so that a single edge can be referenced by one
+value later (for example, by a future change-history table) without carrying a
+two-column foreign key everywhere. Both are candidate keys, which is what keeps
+the relation in BCNF — see section 4.
+
+**Why `incident_component` has no surrogate key.** Here the composite
+`(incident_id, component_id)` *is* the primary key, because the pair is the fact:
+"this incident affected this component". Adding a surrogate id would allow the
+same pair to be inserted twice, which is exactly what must not happen.
+
 **Relational algebra behind the headline query.** "What depends on Payment DB"
 is a selection followed by a projection over a join:
 
@@ -345,6 +376,43 @@ connections**, not described hypothetically. Run them yourself with
 \* InnoDB prevents phantoms at REPEATABLE READ via its MVCC snapshot for plain
 reads and next-key (gap) locking for locking reads. The SQL standard only
 requires this at SERIALIZABLE, so InnoDB is stricter than the standard.
+
+### MVCC — why readers and writers do not block each other
+
+InnoDB does not make a reader wait for a writer. Instead of overwriting a row in
+place and locking everyone out, it keeps **multiple versions** of the row and
+gives each transaction a consistent snapshot. This is *multi-version concurrency
+control*.
+
+How it works, in the terms this project uses:
+
+- Every row carries hidden columns recording the transaction that last changed
+  it, plus a pointer into the **undo log**.
+- When a transaction reads, InnoDB walks that pointer backwards until it finds
+  the newest version that was committed *before the reader's snapshot began*.
+- A plain `SELECT` therefore takes **no locks at all**. It reads a version, not
+  the live row.
+- A **locking** read (`SELECT ... FOR UPDATE` / `FOR SHARE`) deliberately opts
+  out of the snapshot and reads the current row, so it *does* wait.
+
+**Measured in this project.** With session A holding an uncommitted `UPDATE` on
+component 9001:
+
+| Session B runs | Result |
+|---|---|
+| `SELECT criticality ...` (plain) | returns the last committed value **instantly** |
+| `SELECT fn_blast_radius_count(9002)` | **runs normally** |
+| `SELECT ... FOR SHARE` | **blocks** until A finishes |
+
+**Why this matters to InfraTrace specifically.** The entire read-only analysis
+layer — the dashboard, blast radius, risk ranking, every report — is plain
+`SELECT`s. MVCC is the reason that layer keeps working at full speed while
+engineers are recording deployments and updating incidents. Without it, an
+analysis query would either block on every write or read a half-updated graph.
+
+It is also the reason the snapshot in `REPEATABLE READ` is cheap: holding a
+consistent view of the whole database for the duration of a recursive traversal
+costs nothing extra, because the versions already exist.
 
 ### The lost update, and three cures
 
