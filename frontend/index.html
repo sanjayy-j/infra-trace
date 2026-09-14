@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InfraTrace — Service Dependency & Impact Intelligence</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #171d25;
+    --panel-2: #1e2630;
+    --border: #2a3441;
+    --text: #e4e9f0;
+    --muted: #8b97a8;
+    --accent: #4a9eff;
+    --crit: #ef4444;
+    --high: #f59e0b;
+    --med: #3b82f6;
+    --low: #6b7280;
+    --ok: #22c55e;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    padding: 16px 24px; border-bottom: 1px solid var(--border);
+    background: var(--panel); display: flex; align-items: baseline;
+    gap: 16px; flex-wrap: wrap;
+  }
+  header h1 { margin: 0; font-size: 18px; font-weight: 650; letter-spacing: -0.01em; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  header .src {
+    margin-left: auto; font-family: var(--mono); font-size: 11px;
+    color: var(--muted); padding: 4px 10px; border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  nav {
+    display: flex; gap: 2px; padding: 0 24px; background: var(--panel);
+    border-bottom: 1px solid var(--border); overflow-x: auto;
+  }
+  nav button {
+    background: none; border: none; border-bottom: 2px solid transparent;
+    color: var(--muted); padding: 11px 16px; cursor: pointer;
+    font-size: 13px; font-weight: 500; white-space: nowrap;
+  }
+  nav button:hover { color: var(--text); }
+  nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+  main { padding: 24px; max-width: 1500px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .kpis {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+    gap: 12px; margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 14px 16px;
+  }
+  .kpi .label {
+    color: var(--muted); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.04em; margin-bottom: 6px;
+  }
+  .kpi .value { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .kpi .note { color: var(--muted); font-size: 11px; margin-top: 3px; }
+  .kpi.alert .value { color: var(--crit); }
+  .kpi.warn .value  { color: var(--high); }
+
+  section.card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; margin-bottom: 20px; overflow: hidden;
+  }
+  section.card > h2 {
+    margin: 0; padding: 12px 16px; font-size: 13px; font-weight: 600;
+    border-bottom: 1px solid var(--border); background: var(--panel-2);
+  }
+  section.card > h2 .q {
+    color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 12px;
+  }
+  .card-body { padding: 16px; }
+  .scroll { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left; padding: 9px 12px; color: var(--muted);
+    font-weight: 500; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.04em; border-bottom: 1px solid var(--border);
+    white-space: nowrap; background: var(--panel-2);
+  }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--panel-2); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  td.mono, .mono { font-family: var(--mono); font-size: 12px; }
+
+  .pill {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .Critical, .SEV1 { background: rgba(239,68,68,.16); color: #fca5a5; }
+  .High, .SEV2     { background: rgba(245,158,11,.16); color: #fcd34d; }
+  .Medium, .SEV3   { background: rgba(59,130,246,.16); color: #93c5fd; }
+  .Low, .SEV4      { background: rgba(107,114,128,.2);  color: #cbd5e1; }
+  .Resolved        { background: rgba(34,197,94,.16);  color: #86efac; }
+  .Open, .Investigating, .Mitigated { background: rgba(239,68,68,.16); color: #fca5a5; }
+  .Success         { background: rgba(34,197,94,.16);  color: #86efac; }
+  .Failed          { background: rgba(239,68,68,.16);  color: #fca5a5; }
+  .unassigned      { background: rgba(239,68,68,.2);   color: #fca5a5; }
+  .retired         { background: rgba(107,114,128,.25); color: #cbd5e1; }
+  .rollback        { background: rgba(245,158,11,.18); color: #fcd34d; }
+  .confirmed       { background: rgba(239,68,68,.16);  color: #fca5a5; }
+  .correlation     { background: rgba(107,114,128,.2); color: #cbd5e1; }
+
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  select, input[type=search] {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 5px; padding: 7px 10px; font-size: 13px; font-family: inherit;
+  }
+  select:focus, input:focus { outline: 1px solid var(--accent); }
+  label.ctl { color: var(--muted); font-size: 12px; }
+
+  /* Two columns on a normal screen, one when narrow. 330px was too tight -
+     it produced four columns on a wide display and truncated the tables. */
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px; }
+  @media (max-width: 1000px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .chain { display: flex; flex-direction: column; gap: 0; font-family: var(--mono); font-size: 12px; }
+  .chain-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .hop {
+    min-width: 58px; text-align: center; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600; background: var(--panel-2); color: var(--muted);
+  }
+  .bar { height: 6px; border-radius: 3px; background: var(--accent); min-width: 4px; }
+  td.barcell { width: 90px; min-width: 90px; }
+
+  .caveat {
+    background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.28);
+    border-left-width: 3px; border-radius: 4px; padding: 11px 14px;
+    color: #fcd34d; font-size: 12px; margin-bottom: 16px;
+  }
+  .caveat b { color: #fde68a; }
+
+  .empty { color: var(--muted); padding: 20px; text-align: center; font-size: 13px; }
+  .err {
+    background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.35);
+    border-radius: 6px; padding: 16px; color: #fca5a5; font-size: 13px;
+  }
+  .err code { font-family: var(--mono); background: rgba(0,0,0,.3); padding: 1px 5px; border-radius: 3px; }
+  .sql {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    padding: 8px 16px; background: var(--panel-2); border-top: 1px solid var(--border);
+  }
+  svg.graph { width: 100%; height: auto; display: block; }
+  svg.graph text { font-family: system-ui, sans-serif; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 11px; padding: 0 16px 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>InfraTrace</h1>
+  <span class="sub">Service Dependency &amp; Impact Intelligence</span>
+  <span class="src" id="src">connecting…</span>
+</header>
+
+<nav>
+  <button data-view="dashboard" class="active">Dashboard</button>
+  <button data-view="components">Components</button>
+  <button data-view="explorer">Dependency Explorer</button>
+  <button data-view="graph">Dependency Graph</button>
+  <button data-view="incidents">Incidents</button>
+  <button data-view="deployments">Deployments</button>
+</nav>
+
+<main>
+  <div id="fatal"></div>
+
+  <!-- ============================ DASHBOARD ============================ -->
+  <div class="view active" id="view-dashboard">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Highest potential blast radius
+          <span class="q">— which components would hurt most if they failed?</span></h2>
+        <div class="scroll"><table id="tbl-risk"></table></div>
+        <div class="sql">SQL: fn_risk_score() = fn_blast_radius_count() × criticality weight</div>
+      </section>
+
+      <section class="card">
+        <h2>Unowned components
+          <span class="q">— nobody would be paged</span></h2>
+        <div class="scroll"><table id="tbl-unowned"></table></div>
+        <div class="sql">SQL: WHERE component.owner_team_id IS NULL</div>
+      </section>
+
+      <section class="card">
+        <h2>Team risk exposure
+          <span class="q">— who carries the most of it?</span></h2>
+        <div class="scroll"><table id="tbl-teamhealth"></table></div>
+        <div class="sql">SQL: SUM(fn_risk_score()) GROUP BY owning team</div>
+      </section>
+
+      <section class="card">
+        <h2>Incident trend
+          <span class="q">— getting better or worse?</span></h2>
+        <div class="scroll"><table id="tbl-trend"></table></div>
+        <div class="sql">SQL: window functions — SUM() OVER, LAG() OVER, moving average</div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Deployment → incident correlation
+        <span class="q">— did a release cause this?</span></h2>
+      <div class="card-body" style="padding-bottom:0">
+        <div class="caveat">
+          <b>Correlation is not causation.</b> A row marked
+          <span class="pill correlation">CORRELATION ONLY</span> means only that a production
+          deployment happened within 7 days before the incident.
+          <span class="pill confirmed">CONFIRMED</span> means a post-incident review recorded
+          that deployment in <span class="mono">incident.caused_by_deployment_id</span>.
+          The database keeps the two apart on purpose.
+        </div>
+      </div>
+      <div class="scroll"><table id="tbl-corr"></table></div>
+    </section>
+  </div>
+
+  <!-- ============================ COMPONENTS ============================ -->
+  <div class="view" id="view-components">
+    <div class="controls">
+      <label class="ctl">Type <select id="f-type"><option value="">all</option></select></label>
+      <label class="ctl">Criticality <select id="f-crit"><option value="">all</option></select></label>
+      <label class="ctl">State <select id="f-active">
+        <option value="">all</option><option value="true">active</option><option value="false">retired</option>
+      </select></label>
+      <input type="search" id="f-search" placeholder="filter by name…" style="min-width:200px">
+      <span class="ctl" id="comp-count"></span>
+    </div>
+    <section class="card">
+      <h2>Component catalogue <span class="q">— every component with its risk metrics</span></h2>
+      <div class="scroll"><table id="tbl-components"></table></div>
+      <div class="sql">GET /components — metrics from stored functions, ordered by risk score</div>
+    </section>
+  </div>
+
+  <!-- ========================= DEPENDENCY EXPLORER ========================= -->
+  <div class="view" id="view-explorer">
+    <div class="controls">
+      <label class="ctl">Component <select id="pick-component" style="min-width:280px"></select></label>
+      <span class="ctl" id="pick-meta"></span>
+    </div>
+
+    <div class="caveat">
+      <b>Dependency-based potential impact.</b> This traverses the recorded dependency graph.
+      It does <b>not</b> model redundancy, failover, graceful degradation, circuit breakers or
+      live health — none of those are stored in the schema. Read it as
+      “these components have a dependency path to the failure”, not “these will go down”.
+    </div>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Depends on <span class="q">— what this component needs</span></h2>
+        <div class="scroll"><table id="tbl-deps"></table></div>
+        <div class="sql">GET /components/{id}/dependencies</div>
+      </section>
+      <section class="card">
+        <h2>Depended on by <span class="q">— who to notify before a change</span></h2>
+        <div class="scroll"><table id="tbl-dependents"></table></div>
+        <div class="sql">GET /components/{id}/dependents</div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Blast radius <span class="q">— everything reachable from a failure here</span></h2>
+      <div class="card-body" id="blast-chain"></div>
+      <div class="sql">GET /components/{id}/blast-radius — recursive CTE in sp_get_blast_radius</div>
+    </section>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Affected applications <span class="q">— what the customer sees</span></h2>
+        <div class="scroll"><table id="tbl-apps"></table></div>
+      </section>
+      <section class="card">
+        <h2>Teams to page <span class="q">— the escalation list</span></h2>
+        <div class="scroll"><table id="tbl-teams"></table></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Propagation paths <span class="q">— how the failure spreads</span></h2>
+      <div class="card-body"><div id="paths" class="chain"></div></div>
+    </section>
+
+    <section class="card">
+      <h2>Impact subgraph <span class="q">— drawn from the dependency rows</span></h2>
+      <div id="subgraph"></div>
+    </section>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Incident history</h2>
+        <div class="scroll"><table id="tbl-cincidents"></table></div>
+      </section>
+      <section class="card">
+        <h2>Deployment history</h2>
+        <div class="scroll"><table id="tbl-cdeploys"></table></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ============================== GRAPH ============================== -->
+  <div class="view" id="view-graph">
+    <section class="card">
+      <h2>Full dependency graph
+        <span class="q">— arrows point from a component to what it depends on</span></h2>
+      <div class="legend">
+        <span><i class="swatch" style="background:#ef4444"></i> Critical</span>
+        <span><i class="swatch" style="background:#f59e0b"></i> High</span>
+        <span><i class="swatch" style="background:#3b82f6"></i> Medium</span>
+        <span><i class="swatch" style="background:#6b7280"></i> Low</span>
+        <span><i class="swatch" style="background:#fff;opacity:.85"></i> solid arrow = synchronous / data</span>
+        <span><i class="swatch" style="background:repeating-linear-gradient(90deg,#fff 0 3px,transparent 3px 6px)"></i> dashed = asynchronous</span>
+        <span>dashed red outline = unowned</span>
+      </div>
+      <div id="fullgraph"></div>
+      <div class="sql" id="graph-note"></div>
+    </section>
+  </div>
+
+  <!-- ============================ INCIDENTS ============================ -->
+  <div class="view" id="view-incidents">
+    <div class="controls">
+      <label class="ctl">Severity <select id="f-sev"><option value="">all</option>
+        <option>SEV1</option><option>SEV2</option><option>SEV3</option><option>SEV4</option></select></label>
+      <label class="ctl">Status <select id="f-status"><option value="">all</option>
+        <option>Open</option><option>Investigating</option><option>Mitigated</option><option>Resolved</option></select></label>
+      <span class="ctl" id="inc-count"></span>
+    </div>
+    <section class="card">
+      <h2>Incidents <span class="q">— with the components each one affected</span></h2>
+      <div class="scroll"><table id="tbl-incidents"></table></div>
+      <div class="sql">GET /incidents — root cause resolved via incident_component.impact_level</div>
+    </section>
+  </div>
+
+  <!-- =========================== DEPLOYMENTS =========================== -->
+  <div class="view" id="view-deployments">
+    <div class="controls">
+      <label class="ctl">Environment <select id="f-env"><option value="">all</option></select></label>
+      <label class="ctl">Status <select id="f-dstatus"><option value="">all</option>
+        <option>Success</option><option>Failed</option></select></label>
+      <span class="ctl" id="dep-count"></span>
+    </div>
+    <section class="card">
+      <h2>Production infrastructure <span class="q">— what is running right now</span></h2>
+      <div class="scroll"><table id="tbl-prod"></table></div>
+      <div class="sql">
+        production_infrastructure_view — latest SUCCESSFUL production deployment per component,
+        so a rolled-back version is never reported as running
+      </div>
+    </section>
+    <section class="card">
+      <h2>Deployment history</h2>
+      <div class="scroll"><table id="tbl-deployments"></table></div>
+    </section>
+  </div>
+</main>
+
+<script>
+// =====================================================================
+// InfraTrace dashboard
+//
+// Every number on this page comes from the InfraTrace API, which computes
+// it in SQL. There is no analysis logic here: no blast radius is
+// calculated, no risk score is derived. This file fetches rows and draws
+// them. That is deliberate - the database is the single source of truth,
+// so the dashboard and the SQL reports can never disagree.
+// =====================================================================
+
+const API = localStorage.getItem('infratrace_api') || 'http://127.0.0.1:8000';
+
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+/** Escape anything that came from the database before it touches innerHTML. */
+function esc(v) {
+  if (v === null || v === undefined) return '';
+  return String(v).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+const num = v => (v === null || v === undefined) ? '—' : v;
+const dt  = v => v ? esc(String(v).replace('T', ' ').slice(0, 16)) : '—';
+const pill = (v, cls) => v ? `<span class="pill ${cls || esc(v)}">${esc(v)}</span>` : '—';
+const team = v => v === 'UNASSIGNED'
+  ? '<span class="pill unassigned">UNASSIGNED</span>' : esc(v);
+
+async function api(path) {
+  const r = await fetch(API + path);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText} on ${path}`);
+  return r.json();
+}
+
+/** Render a table from column definitions. cols: [label, fn, cssClass?] */
+function table(el, rows, cols, emptyMsg = 'No rows.') {
+  if (!rows || !rows.length) {
+    el.innerHTML = `<tbody><tr><td class="empty">${esc(emptyMsg)}</td></tr></tbody>`;
+    return;
+  }
+  el.innerHTML =
+    `<thead><tr>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead>` +
+    `<tbody>${rows.map(r =>
+      `<tr>${cols.map(c => `<td class="${c[2] || ''}">${c[1](r)}</td>`).join('')}</tr>`
+    ).join('')}</tbody>`;
+}
+
+function fatal(err) {
+  $('#fatal').innerHTML = `
+    <div class="err">
+      <b>Cannot reach the InfraTrace API.</b><br><br>
+      <code>${esc(err.message)}</code><br><br>
+      Start it with:<br>
+      <code>cd backend &amp;&amp; python -m uvicorn app.main:app --reload</code><br><br>
+      Currently calling <code>${esc(API)}</code>.
+      To point elsewhere, run this in the browser console:<br>
+      <code>localStorage.setItem('infratrace_api','http://host:port'); location.reload()</code>
+    </div>`;
+  $('#src').textContent = 'API unreachable';
+}
+
+// --------------------------------------------------------------- nav
+$$('nav button').forEach(b => b.onclick = () => {
+  $$('nav button').forEach(x => x.classList.remove('active'));
+  $$('.view').forEach(v => v.classList.remove('active'));
+  b.classList.add('active');
+  $('#view-' + b.dataset.view).classList.add('active');
+  if (b.dataset.view === 'graph' && !window._graphLoaded) loadGraph();
+});
+
+// --------------------------------------------------------- dashboard
+async function loadDashboard() {
+  const s = await api('/analytics/summary');
+
+  const kpi = (label, value, note, cls) => `
+    <div class="kpi ${cls || ''}">
+      <div class="label">${esc(label)}</div>
+      <div class="value">${esc(value)}</div>
+      <div class="note">${esc(note || '')}</div>
+    </div>`;
+
+  $('#kpis').innerHTML = [
+    kpi('Applications', s.applications, 'customer-facing + internal'),
+    kpi('Components', s.components, `${s.retired_components} retired`),
+    kpi('Teams', s.teams, `${s.developers} engineers`),
+    kpi('Dependencies', s.dependencies, 'graph edges'),
+    kpi('Open incidents', s.open_incidents,
+        `${s.open_sev1_incidents} of them SEV1`, s.open_incidents > 0 ? 'alert' : ''),
+    kpi('SEV1 total', s.sev1_incidents, `of ${s.incidents} incidents`, 'warn'),
+    kpi('Unowned', s.unowned_components, 'nobody is paged',
+        s.unowned_components > 0 ? 'alert' : ''),
+    kpi('Critical components', s.critical_components, 'criticality = Critical', 'warn'),
+    kpi('In production', s.components_in_production, 'live right now'),
+    kpi('Avg resolution', (s.avg_resolution_minutes ?? '—') + 'm', 'resolved incidents only'),
+    kpi('Deployments', s.deployments,
+        `${s.failed_deployments} failed, ${s.rollbacks} rolled back`),
+    kpi('Deploy-caused', s.deploy_caused_incidents, 'confirmed by review'),
+  ].join('');
+
+  const risk = await api('/analytics/high-risk-components?limit=8');
+  table($('#tbl-risk'), risk.components, [
+    ['Component', r => esc(r.component_name)],
+    ['Criticality', r => pill(r.criticality)],
+    ['Owner', r => team(r.owning_team)],
+    ['Blast', r => num(r.blast_radius), 'num'],
+    ['Score', r => `<b>${num(r.risk_score)}</b>`, 'num'],
+    ['Band', r => esc(r.blast_radius_band)],
+  ]);
+
+  const un = await api('/analytics/unowned-components');
+  table($('#tbl-unowned'), un.components, [
+    ['Component', r => esc(r.component_name)],
+    ['Type', r => esc(r.component_type)],
+    ['Criticality', r => pill(r.criticality)],
+    ['State', r => r.is_active ? 'active' : '<span class="pill retired">retired</span>'],
+    ['Blast', r => num(r.blast_radius), 'num'],
+    ['Incidents', r => num(r.incident_count), 'num'],
+  ], 'Every component has an owner.');
+
+  const th = await api('/analytics/team-health');
+  table($('#tbl-teamhealth'), th.teams, [
+    ['Team', r => team(r.team_name)],
+    ['Components', r => num(r.components), 'num'],
+    ['Critical', r => num(r.critical_components), 'num'],
+    ['Total risk', r => `<b>${num(r.total_risk_score)}</b>`, 'num'],
+    ['Worst', r => esc(r.riskiest_component)],
+  ]);
+
+  const tr = await api('/analytics/incident-trend');
+  const maxInc = Math.max(1, ...tr.trend.map(t => t.incidents));
+  table($('#tbl-trend'), tr.trend, [
+    ['Month', r => esc(String(r.month_start).slice(0, 7))],
+    ['Incidents', r => num(r.incidents), 'num'],
+    ['', r => `<div class="bar" style="width:${Math.max(6, (r.incidents / maxInc) * 80)}px"></div>`, 'barcell'],
+    ['SEV1', r => num(r.sev1), 'num'],
+    ['Cumulative', r => num(r.cumulative_incidents), 'num'],
+    ['Δ', r => r.change_vs_previous === null ? '—'
+        : (r.change_vs_previous > 0 ? '+' : '') + r.change_vs_previous, 'num'],
+    ['3-mo avg', r => num(r.three_month_moving_avg), 'num'],
+  ]);
+
+  const co = await api('/analytics/deploy-incident-correlation');
+  $$('#tbl-corr')[0].dataset.note = '';
+  table($('#tbl-corr'), co.results, [
+    ['Status', r => r.causal_status === 'CONFIRMED'
+        ? '<span class="pill confirmed">CONFIRMED</span>'
+        : '<span class="pill correlation">CORRELATION ONLY</span>'],
+    ['Component', r => esc(r.component_name)],
+    ['Version', r => `<span class="mono">${esc(r.deployed_version)}</span>`],
+    ['Deployed', r => dt(r.deployed_at)],
+    ['Sev', r => pill(r.severity)],
+    ['Incident', r => esc(r.title)],
+    ['Hrs after', r => num(r.hours_after_deploy), 'num'],
+  ]);
+}
+
+// -------------------------------------------------------- components
+let ALL_COMPONENTS = [];
+
+async function loadComponents() {
+  const d = await api('/components?limit=500');
+  ALL_COMPONENTS = d.components;
+
+  const fill = (sel, vals) => {
+    const el = $(sel);
+    [...new Set(vals)].sort().forEach(v => {
+      const o = document.createElement('option'); o.textContent = v; el.append(o);
+    });
+  };
+  fill('#f-type', ALL_COMPONENTS.map(c => c.component_type));
+  fill('#f-crit', ALL_COMPONENTS.map(c => c.criticality));
+
+  const picker = $('#pick-component');
+  picker.innerHTML = '';
+  ALL_COMPONENTS.slice()
+    .sort((a, b) => a.component_name.localeCompare(b.component_name))
+    .forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.component_id;
+      o.textContent = `${c.component_name}  (${c.component_type})`;
+      picker.append(o);
+    });
+  // open on the demo component: Payment DB
+  const pay = ALL_COMPONENTS.find(c => c.component_name === 'Payment DB');
+  if (pay) picker.value = pay.component_id;
+  picker.onchange = () => loadExplorer(+picker.value);
+
+  ['#f-type', '#f-crit', '#f-active'].forEach(s => $(s).onchange = renderComponents);
+  $('#f-search').oninput = renderComponents;
+  renderComponents();
+  loadExplorer(+picker.value);
+}
+
+function renderComponents() {
+  const t = $('#f-type').value, c = $('#f-crit').value,
+        a = $('#f-active').value, q = $('#f-search').value.toLowerCase();
+  const rows = ALL_COMPONENTS.filter(x =>
+    (!t || x.component_type === t) &&
+    (!c || x.criticality === c) &&
+    (!a || String(!!x.is_active) === a) &&
+    (!q || x.component_name.toLowerCase().includes(q)));
+
+  $('#comp-count').textContent = `${rows.length} of ${ALL_COMPONENTS.length}`;
+  table($('#tbl-components'), rows, [
+    ['Component', r => esc(r.component_name)],
+    ['Type', r => esc(r.component_type)],
+    ['Criticality', r => pill(r.criticality)],
+    ['Owner', r => team(r.owning_team)],
+    ['State', r => r.is_active ? 'active' : '<span class="pill retired">retired</span>'],
+    ['Stack', r => `<span class="mono">${esc(r.tech_stack || '—')}</span>`],
+    ['Dependents', r => num(r.direct_dependents), 'num'],
+    ['Blast', r => num(r.blast_radius), 'num'],
+    ['Depth', r => num(r.dependency_depth), 'num'],
+    ['Incidents', r => num(r.incident_count), 'num'],
+    ['Risk', r => `<b>${num(r.risk_score)}</b>`, 'num'],
+    ['', r => `<a href="#" onclick="gotoExplorer(${r.component_id});return false"
+                  style="color:var(--accent);text-decoration:none">explore →</a>`],
+  ], 'No components match those filters.');
+}
+
+window.gotoExplorer = id => {
+  $('#pick-component').value = id;
+  $$('nav button').find(b => b.dataset.view === 'explorer').click();
+  loadExplorer(id);
+};
+
+// ---------------------------------------------------------- explorer
+async function loadExplorer(id) {
+  if (!id) return;
+  const [c, deps, dependents, blast, inc, dep] = await Promise.all([
+    api(`/components/${id}`),
+    api(`/components/${id}/dependencies`),
+    api(`/components/${id}/dependents`),
+    api(`/components/${id}/blast-radius`),
+    api(`/components/${id}/incidents`),
+    api(`/components/${id}/deployments`),
+  ]);
+
+  $('#pick-meta').innerHTML =
+    `${pill(c.criticality)} &nbsp; owner: ${team(c.owning_team)} &nbsp; ` +
+    `blast radius <b>${num(c.blast_radius)}</b> &nbsp; risk score <b>${num(c.risk_score)}</b> ` +
+    `&nbsp; depth ${num(c.dependency_depth)}`;
+
+  const edgeCols = nameKey => ([
+    ['Component', r => esc(r.component_name)],
+    ['Type', r => esc(r.component_type)],
+    ['Criticality', r => pill(r.criticality)],
+    ['Link', r => esc(r.dependency_type)],
+    ['Critical path', r => r.is_critical ? '<span class="pill High">YES</span>' : 'no'],
+    ['Owner', r => team(r.owning_team)],
+  ]);
+
+  table($('#tbl-deps'), deps.dependencies, edgeCols(),
+        `${c.component_name} depends on nothing — it is a foundation component.`);
+  table($('#tbl-dependents'), dependents.dependents, edgeCols(),
+        `Nothing depends on ${c.component_name} — it is an entry point.`);
+
+  // blast radius chain
+  const chain = blast.affected_components;
+  if (!chain.length) {
+    $('#blast-chain').innerHTML =
+      `<div class="empty">Nothing depends on ${esc(c.component_name)}, so a failure here
+       spreads no further inside the system.</div>`;
+  } else {
+    const maxHop = Math.max(...chain.map(r => r.hops_away));
+    $('#blast-chain').innerHTML =
+      `<div class="chain">` +
+      `<div class="chain-row"><span class="hop" style="background:rgba(239,68,68,.22);color:#fca5a5">FAILED</span>
+        <b>${esc(c.component_name)}</b></div>` +
+      chain.map(r => `
+        <div class="chain-row">
+          <span class="hop">hop ${r.hops_away}</span>
+          <span class="bar" style="width:${(1 - (r.hops_away - 1) / (maxHop + 1)) * 160}px;
+                background:${['#ef4444','#f97316','#f59e0b','#eab308','#84cc16'][Math.min(r.hops_away,4)]}"></span>
+          <span>${esc(r.affected_component)}</span>
+          ${pill(r.criticality)}
+          <span style="color:var(--muted)">→ ${team(r.team_to_notify)}</span>
+        </div>`).join('') + `</div>`;
+  }
+
+  table($('#tbl-apps'), blast.affected_applications, [
+    ['Application', r => esc(r.application_name)],
+    ['Type', r => esc(r.app_type)],
+    ['Affected parts', r => num(r.affected_components_used), 'num'],
+    ['Via', r => `<span class="mono">${esc(r.via_components)}</span>`],
+  ], 'No application uses anything in this blast radius.');
+
+  table($('#tbl-teams'), blast.affected_teams, [
+    ['Team', r => team(r.team_name)],
+    ['Contact', r => `<span class="mono">${esc(r.team_email || '—')}</span>`],
+    ['Nearest hop', r => num(r.nearest_hop), 'num'],
+    ['Components', r => num(r.components_affected), 'num'],
+  ]);
+
+  $('#paths').innerHTML = blast.propagation_paths.length
+    ? blast.propagation_paths.map(p =>
+        `<div class="chain-row"><span class="hop">${p.hops} hop${p.hops > 1 ? 's' : ''}</span>
+         <span>${esc(p.propagation_path)}</span></div>`).join('')
+    : '<div class="empty">No propagation path — nothing depends on this component.</div>';
+
+  drawGraph($('#subgraph'), blast.subgraph_edges, id, c.component_name);
+
+  table($('#tbl-cincidents'), inc.incidents, [
+    ['Sev', r => pill(r.severity)],
+    ['Status', r => pill(r.status)],
+    ['Incident', r => esc(r.title)],
+    ['Impact', r => esc(r.impact_level)],
+    ['Started', r => dt(r.started_at)],
+    ['Mins', r => num(r.resolution_minutes), 'num'],
+  ], 'No incident has ever involved this component.');
+
+  table($('#tbl-cdeploys'), dep.deployments, [
+    ['Version', r => `<span class="mono">${esc(r.version)}</span>`],
+    ['Environment', r => esc(r.environment_name)],
+    ['Status', r => pill(r.status)],
+    ['Rollback', r => r.is_rollback ? '<span class="pill rollback">ROLLBACK</span>' : ''],
+    ['Deployed', r => dt(r.deployed_at)],
+    ['By', r => esc(r.deployed_by || '—')],
+  ], 'Never deployed.');
+}
+
+// ------------------------------------------------------------- graph
+/**
+ * Draw a dependency graph as layered SVG.
+ *
+ * Layout: nodes are assigned to columns by their longest distance from a
+ * root (something nothing depends on). That mirrors how the dependency
+ * chain actually reads - callers on the left, foundations on the right -
+ * and needs no physics simulation or external library.
+ */
+function drawGraph(host, edges, focusId, focusName) {
+  if (!edges || !edges.length) {
+    host.innerHTML = '<div class="empty">No edges to draw.</div>';
+    return;
+  }
+  const byId = new Map();
+  const add = (id, name) => {
+    if (!byId.has(id)) byId.set(id, { id, name, out: [], in: [] });
+    return byId.get(id);
+  };
+  edges.forEach(e => {
+    const s = add(e.source_id, e.source_name), t = add(e.target_id, e.target_name);
+    s.out.push(t.id); t.in.push(s.id);
+  });
+
+  const meta = new Map(ALL_COMPONENTS.map(c => [c.component_id, c]));
+  const nodes = [...byId.values()];
+
+  // longest-path layering from the roots (nodes with no inbound "depended on by")
+  const depth = new Map(nodes.map(n => [n.id, 0]));
+  for (let pass = 0; pass < nodes.length; pass++) {
+    let changed = false;
+    edges.forEach(e => {
+      const d = depth.get(e.source_id) + 1;
+      if (d > depth.get(e.target_id)) { depth.set(e.target_id, d); changed = true; }
+    });
+    if (!changed) break;
+  }
+
+  const cols = new Map();
+  nodes.forEach(n => {
+    const d = depth.get(n.id);
+    if (!cols.has(d)) cols.set(d, []);
+    cols.get(d).push(n);
+  });
+
+  const COL_W = 210, ROW_H = 52, PAD = 20, BOX_W = 172, BOX_H = 34;
+  const maxRows = Math.max(...[...cols.values()].map(c => c.length));
+  const W = PAD * 2 + cols.size * COL_W;
+  const H = PAD * 2 + maxRows * ROW_H;
+
+  const pos = new Map();
+  [...cols.keys()].sort((a, b) => a - b).forEach((d, ci) => {
+    const list = cols.get(d);
+    list.forEach((n, ri) => {
+      const offset = (maxRows - list.length) * ROW_H / 2;
+      pos.set(n.id, { x: PAD + ci * COL_W, y: PAD + offset + ri * ROW_H });
+    });
+  });
+
+  const colourOf = id => {
+    const m = meta.get(id);
+    return ({ Critical: '#ef4444', High: '#f59e0b', Medium: '#3b82f6', Low: '#6b7280' })
+      [m ? m.criticality : 'Low'] || '#6b7280';
+  };
+
+  const arrows = edges.map(e => {
+    const a = pos.get(e.source_id), b = pos.get(e.target_id);
+    if (!a || !b) return '';
+    const x1 = a.x + BOX_W, y1 = a.y + BOX_H / 2, x2 = b.x, y2 = b.y + BOX_H / 2;
+    const mx = (x1 + x2) / 2;
+    return `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"
+      fill="none" stroke="${e.is_critical ? '#ef4444' : '#4a5568'}"
+      stroke-width="${e.is_critical ? 1.8 : 1.2}"
+      ${e.dependency_type === 'Asynchronous' ? 'stroke-dasharray="4 3"' : ''}
+      marker-end="url(#ah)" opacity="0.75"/>`;
+  }).join('');
+
+  const boxes = nodes.map(n => {
+    const p = pos.get(n.id), m = meta.get(n.id);
+    const unowned = m && m.owning_team === 'UNASSIGNED';
+    const isFocus = n.id === focusId;
+    const label = n.name.length > 22 ? n.name.slice(0, 21) + '…' : n.name;
+    return `<g>
+      <rect x="${p.x}" y="${p.y}" width="${BOX_W}" height="${BOX_H}" rx="5"
+        fill="${isFocus ? 'rgba(239,68,68,.22)' : '#1e2630'}"
+        stroke="${unowned ? '#ef4444' : colourOf(n.id)}"
+        stroke-width="${isFocus ? 2.4 : 1.4}"
+        ${unowned ? 'stroke-dasharray="4 3"' : ''}/>
+      <rect x="${p.x}" y="${p.y}" width="4" height="${BOX_H}" rx="2" fill="${colourOf(n.id)}"/>
+      <text x="${p.x + 12}" y="${p.y + 15}" fill="#e4e9f0" font-size="11.5"
+        font-weight="${isFocus ? 700 : 500}">${esc(label)}</text>
+      <text x="${p.x + 12}" y="${p.y + 27}" fill="#8b97a8" font-size="9.5">${esc(
+        (m ? m.component_type : '') + (unowned ? ' · UNOWNED' : ''))}</text>
+      <title>${esc(n.name)}${m ? ` — ${m.component_type}, ${m.criticality}, owner ${m.owning_team}` : ''}</title>
+    </g>`;
+  }).join('');
+
+  host.innerHTML = `
+    <svg class="graph" viewBox="0 0 ${W} ${H}" role="img"
+         aria-label="Dependency graph${focusName ? ' for ' + esc(focusName) : ''}">
+      <defs>
+        <marker id="ah" viewBox="0 0 8 8" refX="7" refY="4"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,1 L7,4 L0,7 z" fill="#4a5568"/>
+        </marker>
+      </defs>
+      ${arrows}${boxes}
+    </svg>`;
+}
+
+async function loadGraph() {
+  const g = await api('/graph');
+  drawGraph($('#fullgraph'), g.edges, null, null);
+  const cyc = await api('/graph/cycles');
+  $('#graph-note').textContent =
+    `${g.nodes.length} components, ${g.edges.length} dependency edges. ` +
+    `${g.edge_direction}. Cycle check: ${cyc.acyclic ? 'acyclic (0 cycles found)'
+      : cyc.cycles_found + ' CYCLES FOUND'}.`;
+  window._graphLoaded = true;
+}
+
+// --------------------------------------------------------- incidents
+async function loadIncidents() {
+  const render = async () => {
+    const p = new URLSearchParams({ limit: '500' });
+    if ($('#f-sev').value) p.set('severity', $('#f-sev').value);
+    if ($('#f-status').value) p.set('status', $('#f-status').value);
+    const d = await api('/incidents?' + p);
+    $('#inc-count').textContent = `${d.count} incidents`;
+    table($('#tbl-incidents'), d.incidents, [
+      ['Sev', r => pill(r.severity)],
+      ['Status', r => pill(r.status)],
+      ['Incident', r => esc(r.title)],
+      ['Root cause', r => esc(r.root_cause_component || '—')],
+      ['Affected', r => `<span class="mono">${esc(r.affected_components)}</span>`],
+      ['Env', r => esc(r.environment_name)],
+      ['Started', r => dt(r.started_at)],
+      ['Mins', r => num(r.resolution_minutes), 'num'],
+      ['Caused by deploy', r => r.caused_by_deployment_id
+          ? '<span class="pill confirmed">CONFIRMED</span>' : ''],
+    ], 'No incidents match those filters.');
+  };
+  $('#f-sev').onchange = render;
+  $('#f-status').onchange = render;
+  await render();
+}
+
+// ------------------------------------------------------- deployments
+async function loadDeployments() {
+  const prod = await api('/analytics/production-infrastructure');
+  table($('#tbl-prod'), prod.components, [
+    ['Component', r => esc(r.component_name)],
+    ['Criticality', r => pill(r.criticality)],
+    ['Owner', r => team(r.owning_team)],
+    ['Running version', r => `<span class="mono">${esc(r.running_version)}</span>`],
+    ['Deployed', r => dt(r.deployed_at)],
+    ['By', r => esc(r.deployed_by || '—')],
+    ['Region', r => esc(r.region)],
+  ]);
+
+  const envs = await api('/environments');
+  const sel = $('#f-env');
+  envs.environments.forEach(e => {
+    const o = document.createElement('option');
+    o.textContent = e.environment_name; sel.append(o);
+  });
+
+  const render = async () => {
+    const p = new URLSearchParams({ limit: '500' });
+    if ($('#f-env').value) p.set('environment', $('#f-env').value);
+    if ($('#f-dstatus').value) p.set('status', $('#f-dstatus').value);
+    const d = await api('/deployments?' + p);
+    $('#dep-count').textContent = `${d.count} deployments`;
+    table($('#tbl-deployments'), d.deployments, [
+      ['Component', r => esc(r.component_name)],
+      ['Version', r => `<span class="mono">${esc(r.version)}</span>`],
+      ['Environment', r => esc(r.environment_name)],
+      ['Status', r => pill(r.status)],
+      ['Rollback', r => r.is_rollback ? '<span class="pill rollback">ROLLBACK</span>' : ''],
+      ['Deployed', r => dt(r.deployed_at)],
+      ['By', r => esc(r.deployed_by || '—')],
+    ], 'No deployments match those filters.');
+  };
+  $('#f-env').onchange = render;
+  $('#f-dstatus').onchange = render;
+  await render();
+}
+
+// -------------------------------------------------------------- boot
+(async function init() {
+  try {
+    const h = await api('/health');
+    const d = h.database;
+    $('#src').textContent =
+      `MySQL ${d.version} · ${d.db} · ${d.tables} tables · ${d.views} views · ${d.routines} routines`;
+    await loadComponents();     // must run first: it fills the shared component cache
+    await loadDashboard();
+    await loadIncidents();
+    await loadDeployments();
+  } catch (err) {
+    fatal(err);
+  }
+})();
+</script>
+</body>
+</html>

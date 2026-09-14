@@ -1,0 +1,67 @@
+# =====================================================================
+# InfraTrace - .gitignore
+# =====================================================================
+
+# --- Secrets: NEVER commit -------------------------------------------
+.env
+.env.*
+!.env.example
+backend/.env
+my.cnf
+*.cnf
+config.local.*
+*credentials*
+*secret*
+
+# --- Database dumps and local data -----------------------------------
+*.sql.bak
+*.dump
+*.mysql_history
+dump/
+backups/
+
+# --- Python -----------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# --- Node (only if the frontend ever grows a build step) --------------
+node_modules/
+dist/
+build/
+
+# --- Test and tooling output ------------------------------------------
+playwright-report/
+test-results/
+*.png.tmp
+screenshots/
+
+# --- Editors and IDEs -------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS ---------------------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# --- Logs and temporary files ----------------------------------------
+*.log
+logs/
+tmp/
+temp/
+*.tmp
