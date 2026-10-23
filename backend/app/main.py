@@ -32,9 +32,12 @@ app = FastAPI(
     title="InfraTrace API",
     description=(
         "Service dependency and impact intelligence, served directly from a "
-        "normalised MySQL schema. All analysis is computed in SQL."
+        "normalised MySQL schema. Every analytical result is computed in SQL. "
+        "The /ml endpoints add a predictive layer on top of those results and "
+        "label their output as a model estimate; they never replace a SQL "
+        "answer with a predicted one."
     ),
-    version="1.0.0",
+    version="1.1.0",
 )
 
 # CORS: the dashboard is served from a different origin during development.
@@ -485,3 +488,22 @@ def get_cycles() -> dict[str, Any]:
         "cycles_found": len(rows),
         "cycles": rows,
     }
+
+
+# ---------------------------------------------------------------------
+# ML layer (optional)
+#
+# Mounted defensively. The ML endpoints need torch and a trained artifact;
+# neither is required to run InfraTrace. If the import fails, the other 27
+# endpoints must still serve, so the failure is recorded and swallowed rather
+# than propagated - an estate without a trained model is a normal state, not
+# an error. The router itself returns 503 with instructions when it is
+# reachable but has no model to serve.
+# ---------------------------------------------------------------------
+ML_ROUTER_ERROR: str | None = None
+try:
+    from .ml_api import router as ml_router
+
+    app.include_router(ml_router)
+except Exception as exc:  # pragma: no cover - exercised by absence of torch
+    ML_ROUTER_ERROR = f"{type(exc).__name__}: {exc}"

@@ -1,0 +1,5058 @@
+{
+  "purpose": "fixed-weight propagation heuristic vs frozen SCP-GNN",
+  "frozen_source": "topology_v2.json",
+  "protocol": {
+    "partitions_scanned": 32,
+    "partitions_analysed": 30,
+    "inits_for_fitted_arm": 3,
+    "subgraphs": {
+      "train": 60,
+      "val": 18,
+      "test": 32
+    },
+    "cascades": 6,
+    "epochs": 120,
+    "nodes_per_subgraph": [
+      40,
+      120
+    ],
+    "min_edges": 25,
+    "reproduction_tolerance": 1e-12,
+    "primary_set": "TEST-R"
+  },
+  "arms": [
+    {
+      "name": "H-IR-noisyOR",
+      "aggregator": "noisy_or",
+      "rounds": 4,
+      "trainable": false,
+      "notes": "IncidentRelay's documented multipliers, SCP's combination rule. Isolates the weights by holding the rule fixed."
+    },
+    {
+      "name": "H-IR-maxProduct",
+      "aggregator": "max_product",
+      "rounds": 4,
+      "trainable": false,
+      "notes": "IncidentRelay as documented: its multipliers AND its propagation rule. The deployable incumbent."
+    },
+    {
+      "name": "H-ORACLE",
+      "aggregator": "noisy_or",
+      "rounds": 4,
+      "trainable": false,
+      "notes": "ORACLE - handed the generator's own per-type rates. Not deployable. Upper bound for any fixed table here."
+    },
+    {
+      "name": "H-FIT (8 params)",
+      "aggregator": "noisy_or",
+      "rounds": 4,
+      "trainable": true,
+      "notes": "Fair information-matched arm: same loop, loss, epochs and early stopping as SCP-GNN; train/val data only; 8 learned cells instead of a 1,441-parameter MLP."
+    }
+  ],
+  "runtime_seconds": 427.2038395999998,
+  "protected_unchanged": true,
+  "protected_changed": [],
+  "comparisons": {
+    "TEST-R": {
+      "H-IR-noisyOR": {
+        "pr_auc": {
+          "n_partitions": 30,
+          "scp_mean": 0.551917995572486,
+          "arm_mean": 0.5216245575239278,
+          "mean_gap": 0.03029343804855807,
+          "median_gap": 0.03098177418760223,
+          "min_gap": 0.0019085360453549027,
+          "max_gap": 0.05144397010761392,
+          "sd_gap": 0.011805379695685753,
+          "partitions_scp_ahead": 30
+        },
+        "precision": {
+          "n_partitions": 30,
+          "scp_mean": 0.49765173133519774,
+          "arm_mean": 0.35242134882792986,
+          "mean_gap": 0.14523038250726786,
+          "median_gap": 0.1388779556182496,
+          "min_gap": 0.08809156090700149,
+          "max_gap": 0.2580831991657748,
+          "sd_gap": 0.0438543140203526,
+          "partitions_scp_ahead": 30
+        },
+        "recall": {
+          "n_partitions": 30,
+          "scp_mean": 0.6825851842346484,
+          "arm_mean": 0.9733726635757228,
+          "mean_gap": -0.2907874793410744,
+          "median_gap": -0.2758501306457633,
+          "min_gap": -0.4832116788321168,
+          "max_gap": -0.15369946605644547,
+          "sd_gap": 0.08672505058404217,
+          "partitions_scp_ahead": 0
+        },
+        "f1": {
+          "n_partitions": 30,
+          "scp_mean": 0.5696319686149206,
+          "arm_mean": 0.5165748623508882,
+          "mean_gap": 0.05305710626403227,
+          "median_gap": 0.05294839283596131,
+          "min_gap": -0.0039429983382625045,
+          "max_gap": 0.10975086716687282,
+          "sd_gap": 0.024693958377373607,
+          "partitions_scp_ahead": 29
+        },
+        "ece": {
+          "n_partitions": 30,
+          "scp_mean": 0.13164962659316856,
+          "arm_mean": 0.4603204541279632,
+          "mean_gap": -0.3286708275347945,
+          "median_gap": -0.3283290605724464,
+          "min_gap": -0.41005376556570183,
+          "max_gap": -0.22864853227426593,
+          "sd_gap": 0.04448791233600671,
+          "partitions_scp_ahead": 0
+        }
+      },
+      "H-IR-maxProduct": {
+        "pr_auc": {
+          "n_partitions": 30,
+          "scp_mean": 0.551917995572486,
+          "arm_mean": 0.509887600498849,
+          "mean_gap": 0.04203039507363697,
+          "median_gap": 0.04226184799693952,
+          "min_gap": -0.010285171674924487,
+          "max_gap": 0.08044992701710363,
+          "sd_gap": 0.020526009788690326,
+          "partitions_scp_ahead": 29
+        },
+        "precision": {
+          "n_partitions": 30,
+          "scp_mean": 0.49765173133519774,
+          "arm_mean": 0.3563794962330001,
+          "mean_gap": 0.14127223510219764,
+          "median_gap": 0.136103704621588,
+          "min_gap": 0.08609813758052054,
+          "max_gap": 0.2494207882423467,
+          "sd_gap": 0.04235746564015873,
+          "partitions_scp_ahead": 30
+        },
+        "recall": {
+          "n_partitions": 30,
+          "scp_mean": 0.6825851842346484,
+          "arm_mean": 0.9696125574101838,
+          "mean_gap": -0.28702737317553556,
+          "median_gap": -0.2723570895323414,
+          "min_gap": -0.4781021897810219,
+          "max_gap": -0.15369946605644547,
+          "sd_gap": 0.08571631919873479,
+          "partitions_scp_ahead": 0
+        },
+        "f1": {
+          "n_partitions": 30,
+          "scp_mean": 0.5696319686149206,
+          "arm_mean": 0.5203820526053539,
+          "mean_gap": 0.0492499160095667,
+          "median_gap": 0.04910421174873669,
+          "min_gap": -0.006953773001069252,
+          "max_gap": 0.09876764955539546,
+          "sd_gap": 0.022931772880242784,
+          "partitions_scp_ahead": 29
+        },
+        "ece": {
+          "n_partitions": 30,
+          "scp_mean": 0.13164962659316856,
+          "arm_mean": 0.42509693888692834,
+          "mean_gap": -0.2934473122937599,
+          "median_gap": -0.29462664734412514,
+          "min_gap": -0.3729935360974387,
+          "max_gap": -0.2083189089617301,
+          "sd_gap": 0.04436649215834557,
+          "partitions_scp_ahead": 0
+        }
+      },
+      "H-ORACLE": {
+        "pr_auc": {
+          "n_partitions": 30,
+          "scp_mean": 0.551917995572486,
+          "arm_mean": 0.5425352119981481,
+          "mean_gap": 0.009382783574337685,
+          "median_gap": 0.009818241032835462,
+          "min_gap": -0.013957221929631003,
+          "max_gap": 0.02896374291401438,
+          "sd_gap": 0.010745678436034412,
+          "partitions_scp_ahead": 26
+        },
+        "precision": {
+          "n_partitions": 30,
+          "scp_mean": 0.49765173133519774,
+          "arm_mean": 0.48020540246725457,
+          "mean_gap": 0.017446328867943263,
+          "median_gap": 0.021065876634780017,
+          "min_gap": -0.04648780395564006,
+          "max_gap": 0.09523063506321072,
+          "sd_gap": 0.0354513763622384,
+          "partitions_scp_ahead": 19
+        },
+        "recall": {
+          "n_partitions": 30,
+          "scp_mean": 0.6825851842346484,
+          "arm_mean": 0.7015406448891234,
+          "mean_gap": -0.018955460654474857,
+          "median_gap": -0.012836376766683477,
+          "min_gap": -0.2598540145985402,
+          "max_gap": 0.1998474446987033,
+          "sd_gap": 0.10319883383488557,
+          "partitions_scp_ahead": 13
+        },
+        "f1": {
+          "n_partitions": 30,
+          "scp_mean": 0.5696319686149206,
+          "arm_mean": 0.5686399191636327,
+          "mean_gap": 0.0009920494512879999,
+          "median_gap": 0.004368076371823737,
+          "min_gap": -0.04952134387826934,
+          "max_gap": 0.037712263122640755,
+          "sd_gap": 0.020483304200826512,
+          "partitions_scp_ahead": 19
+        },
+        "ece": {
+          "n_partitions": 30,
+          "scp_mean": 0.13164962659316856,
+          "arm_mean": 0.1682210044344805,
+          "mean_gap": -0.03657137784131186,
+          "median_gap": -0.043529347533928855,
+          "min_gap": -0.1188500165294179,
+          "max_gap": 0.08607746809564429,
+          "sd_gap": 0.04846255935471345,
+          "partitions_scp_ahead": 8
+        }
+      },
+      "H-FIT (8 params)": {
+        "pr_auc": {
+          "n_partitions": 30,
+          "scp_mean": 0.551917995572486,
+          "arm_mean": 0.5378512381010364,
+          "mean_gap": 0.014066757471449363,
+          "median_gap": 0.012949335626149527,
+          "min_gap": -0.0142501960650262,
+          "max_gap": 0.040015293333652946,
+          "sd_gap": 0.01162663740411424,
+          "partitions_scp_ahead": 27
+        },
+        "precision": {
+          "n_partitions": 30,
+          "scp_mean": 0.49765173133519774,
+          "arm_mean": 0.5072599656414492,
+          "mean_gap": -0.00960823430625145,
+          "median_gap": -0.00856412094643405,
+          "min_gap": -0.05606075201575994,
+          "max_gap": 0.031063279538012967,
+          "sd_gap": 0.02331905402961218,
+          "partitions_scp_ahead": 12
+        },
+        "recall": {
+          "n_partitions": 30,
+          "scp_mean": 0.6825851842346484,
+          "arm_mean": 0.6254900404387436,
+          "mean_gap": 0.057095143795904996,
+          "median_gap": 0.04431595292579277,
+          "min_gap": -0.1244635193133048,
+          "max_gap": 0.2174975562072337,
+          "sd_gap": 0.08600821345779222,
+          "partitions_scp_ahead": 21
+        },
+        "f1": {
+          "n_partitions": 30,
+          "scp_mean": 0.5696319686149206,
+          "arm_mean": 0.5523655867530576,
+          "mean_gap": 0.01726638186186291,
+          "median_gap": 0.011176380622795523,
+          "min_gap": -0.02409099255387348,
+          "max_gap": 0.06982758190796473,
+          "sd_gap": 0.023521616498270437,
+          "partitions_scp_ahead": 24
+        },
+        "ece": {
+          "n_partitions": 30,
+          "scp_mean": 0.13164962659316856,
+          "arm_mean": 0.12041461932462029,
+          "mean_gap": 0.011235007268548298,
+          "median_gap": 0.012499501304301039,
+          "min_gap": -0.04410583849624594,
+          "max_gap": 0.07961023537274403,
+          "sd_gap": 0.028972554925639233,
+          "partitions_scp_ahead": 19
+        }
+      }
+    },
+    "TEST-H": {
+      "H-IR-noisyOR": {
+        "pr_auc": {
+          "n_partitions": 30,
+          "scp_mean": 0.545621719805363,
+          "arm_mean": 0.5155858303277859,
+          "mean_gap": 0.03003588947757728,
+          "median_gap": 0.025563838209317125,
+          "min_gap": 0.0022783270529648236,
+          "max_gap": 0.064023484950949,
+          "sd_gap": 0.01488801788559182,
+          "partitions_scp_ahead": 30
+        },
+        "precision": {
+          "n_partitions": 30,
+          "scp_mean": 0.4921112289295246,
+          "arm_mean": 0.348592086440332,
+          "mean_gap": 0.1435191424891925,
+          "median_gap": 0.1355398003933952,
+          "min_gap": 0.07159796418882447,
+          "max_gap": 0.26083245710211556,
+          "sd_gap": 0.041411472603578685,
+          "partitions_scp_ahead": 30
+        },
+        "recall": {
+          "n_partitions": 30,
+          "scp_mean": 0.6820536913229436,
+          "arm_mean": 0.9720161943684452,
+          "mean_gap": -0.2899625030455018,
+          "median_gap": -0.28073280787245525,
+          "min_gap": -0.5019334880123743,
+          "max_gap": -0.12759767248545295,
+          "sd_gap": 0.08734097952895863,
+          "partitions_scp_ahead": 0
+        },
+        "f1": {
+          "n_partitions": 30,
+          "scp_mean": 0.5668741580453395,
+          "arm_mean": 0.5121609713008258,
+          "mean_gap": 0.054713186744513614,
+          "median_gap": 0.056224643684574416,
+          "min_gap": -0.03818825389290803,
+          "max_gap": 0.11710164961748165,
+          "sd_gap": 0.027902570005021173,
+          "partitions_scp_ahead": 29
+        },
+        "ece": {
+          "n_partitions": 30,
+          "scp_mean": 0.13607884627690592,
+          "arm_mean": 0.4677099938058945,
+          "mean_gap": -0.3316311475289886,
+          "median_gap": -0.32971677584750236,
+          "min_gap": -0.4467608408355862,
+          "max_gap": -0.24115871340709646,
+          "sd_gap": 0.048603196792672373,
+          "partitions_scp_ahead": 0
+        }
+      },
+      "H-IR-maxProduct": {
+        "pr_auc": {
+          "n_partitions": 30,
+          "scp_mean": 0.545621719805363,
+          "arm_mean": 0.5042267975384724,
+          "mean_gap": 0.04139492226689059,
+          "median_gap": 0.04299580026421612,
+          "min_gap": -0.0069671115847250165,
+          "max_gap": 0.07356537864624157,
+          "sd_gap": 0.019885561149835022,
+          "partitions_scp_ahead": 29
+        },
+        "precision": {
+          "n_partitions": 30,
+          "scp_mean": 0.4921112289295246,
+          "arm_mean": 0.35207084056895155,
+          "mean_gap": 0.1400403883605731,
+          "median_gap": 0.13292714391104432,
+          "min_gap": 0.06661183215849514,
+          "max_gap": 0.25486870285736024,
+          "sd_gap": 0.04054062566020077,
+          "partitions_scp_ahead": 30
+        },
+        "recall": {
+          "n_partitions": 30,
+          "scp_mean": 0.6820536913229436,
+          "arm_mean": 0.9681360191560787,
+          "mean_gap": -0.2860823278331352,
+          "median_gap": -0.2776826493433938,
+          "min_gap": -0.4973654066437572,
+          "max_gap": -0.12011637572734823,
+          "sd_gap": 0.08724850267923115,
+          "partitions_scp_ahead": 0
+        },
+        "f1": {
+          "n_partitions": 30,
+          "scp_mean": 0.5668741580453395,
+          "arm_mean": 0.5154090977762544,
+          "mean_gap": 0.05146506026908503,
+          "median_gap": 0.05267157821348778,
+          "min_gap": -0.03853500277718447,
+          "max_gap": 0.11571282677349132,
+          "sd_gap": 0.027061118712301366,
+          "partitions_scp_ahead": 29
+        },
+        "ece": {
+          "n_partitions": 30,
+          "scp_mean": 0.13607884627690592,
+          "arm_mean": 0.4332604926843705,
+          "mean_gap": -0.2971816464074646,
+          "median_gap": -0.2956842547842634,
+          "min_gap": -0.4070283157865251,
+          "max_gap": -0.2051162058401594,
+          "sd_gap": 0.04865046589711578,
+          "partitions_scp_ahead": 0
+        }
+      },
+      "H-ORACLE": {
+        "pr_auc": {
+          "n_partitions": 30,
+          "scp_mean": 0.545621719805363,
+          "arm_mean": 0.5374371254499798,
+          "mean_gap": 0.008184594355383322,
+          "median_gap": 0.0064121103626524345,
+          "min_gap": -0.020637110241671586,
+          "max_gap": 0.036512732913905055,
+          "sd_gap": 0.012162262322931109,
+          "partitions_scp_ahead": 24
+        },
+        "precision": {
+          "n_partitions": 30,
+          "scp_mean": 0.4921112289295246,
+          "arm_mean": 0.4696960274491835,
+          "mean_gap": 0.02241520148034101,
+          "median_gap": 0.019713240998497694,
+          "min_gap": -0.04473636829223182,
+          "max_gap": 0.13394845721200155,
+          "sd_gap": 0.03675025217218567,
+          "partitions_scp_ahead": 21
+        },
+        "recall": {
+          "n_partitions": 30,
+          "scp_mean": 0.6820536913229436,
+          "arm_mean": 0.7109364604886076,
+          "mean_gap": -0.028882769165663878,
+          "median_gap": -0.02520503761233306,
+          "min_gap": -0.2471935853379153,
+          "max_gap": 0.15477538693846726,
+          "sd_gap": 0.09074438792788103,
+          "partitions_scp_ahead": 11
+        },
+        "f1": {
+          "n_partitions": 30,
+          "scp_mean": 0.5668741580453395,
+          "arm_mean": 0.564654733779398,
+          "mean_gap": 0.0022194242659412983,
+          "median_gap": 0.003228807785408516,
+          "min_gap": -0.02995626343756419,
+          "max_gap": 0.03762849613572983,
+          "sd_gap": 0.016563381504078673,
+          "partitions_scp_ahead": 18
+        },
+        "ece": {
+          "n_partitions": 30,
+          "scp_mean": 0.13607884627690592,
+          "arm_mean": 0.17806378745318557,
+          "mean_gap": -0.04198494117627961,
+          "median_gap": -0.03991678422298633,
+          "min_gap": -0.1399954473018809,
+          "max_gap": 0.06559387204103878,
+          "sd_gap": 0.04812792071975967,
+          "partitions_scp_ahead": 7
+        }
+      },
+      "H-FIT (8 params)": {
+        "pr_auc": {
+          "n_partitions": 30,
+          "scp_mean": 0.545621719805363,
+          "arm_mean": 0.5336271707456817,
+          "mean_gap": 0.011994549059681444,
+          "median_gap": 0.009020230024670561,
+          "min_gap": -0.009661390056950048,
+          "max_gap": 0.0488116582745467,
+          "sd_gap": 0.014097524114964278,
+          "partitions_scp_ahead": 26
+        },
+        "precision": {
+          "n_partitions": 30,
+          "scp_mean": 0.4921112289295246,
+          "arm_mean": 0.5002157737510087,
+          "mean_gap": -0.008104544821484127,
+          "median_gap": -0.009719986135446473,
+          "min_gap": -0.07078501508076657,
+          "max_gap": 0.034334451392162846,
+          "sd_gap": 0.02244372828385986,
+          "partitions_scp_ahead": 10
+        },
+        "recall": {
+          "n_partitions": 30,
+          "scp_mean": 0.6820536913229436,
+          "arm_mean": 0.6371333849939925,
+          "mean_gap": 0.0449203063289513,
+          "median_gap": 0.03474494393000205,
+          "min_gap": -0.10361681329423278,
+          "max_gap": 0.2082752208275221,
+          "sd_gap": 0.07800831478970553,
+          "partitions_scp_ahead": 20
+        },
+        "f1": {
+          "n_partitions": 30,
+          "scp_mean": 0.5668741580453395,
+          "arm_mean": 0.5535703592207618,
+          "mean_gap": 0.013303798824577617,
+          "median_gap": 0.008723444275664016,
+          "min_gap": -0.018379747473914576,
+          "max_gap": 0.049967388541690694,
+          "sd_gap": 0.019927889449173612,
+          "partitions_scp_ahead": 22
+        },
+        "ece": {
+          "n_partitions": 30,
+          "scp_mean": 0.13607884627690592,
+          "arm_mean": 0.12676283542506764,
+          "mean_gap": 0.009316010851838282,
+          "median_gap": 0.008101536103998885,
+          "min_gap": -0.04378965642513202,
+          "max_gap": 0.06561283835580138,
+          "sd_gap": 0.02713387473057933,
+          "partitions_scp_ahead": 18
+        }
+      }
+    }
+  },
+  "partitions": [
+    {
+      "seed": 0,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4012
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4012
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4012
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6981211304664612,
+          "Synchronous/non-critical": 0.4808991849422455,
+          "Asynchronous/critical": 0.42512959241867065,
+          "Asynchronous/non-critical": 0.1943381130695343,
+          "Data/critical": 0.670143187046051,
+          "Data/non-critical": 0.5318204164505005,
+          "Config/critical": 0.29857322573661804,
+          "Config/non-critical": 0.17172718048095703,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5393343661641335,
+            "precision": 0.36621347989586345,
+            "recall": 0.9716039907904835,
+            "f1": 0.5319327731092437,
+            "ece": 0.45384204911081083
+          },
+          "TEST-H": {
+            "pr_auc": 0.5457808085620826,
+            "precision": 0.36821378340365685,
+            "recall": 0.9805243445692884,
+            "f1": 0.5353783231083845,
+            "ece": 0.4693910349382008
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5262125834479753,
+            "precision": 0.37092511013215856,
+            "recall": 0.9693016116653875,
+            "f1": 0.5365335598980459,
+            "ece": 0.4134789001965451
+          },
+          "TEST-H": {
+            "pr_auc": 0.531693475305276,
+            "precision": 0.3732454883987396,
+            "recall": 0.9760299625468165,
+            "f1": 0.5399917115623705,
+            "ece": 0.4278339863057319
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5557176043856678,
+            "precision": 0.47390180878552973,
+            "recall": 0.70376055257099,
+            "f1": 0.5663990117356393,
+            "ece": 0.17532507011319623
+          },
+          "TEST-H": {
+            "pr_auc": 0.5649279444805971,
+            "precision": 0.48544600938967136,
+            "recall": 0.7745318352059926,
+            "f1": 0.5968253968253968,
+            "ece": 0.20043975941156078
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5574544756134157,
+            "precision": 0.5157353885677585,
+            "recall": 0.6162701458173446,
+            "f1": 0.5615384615384614,
+            "ece": 0.10685375524668074
+          },
+          "TEST-H": {
+            "pr_auc": 0.5574229172530716,
+            "precision": 0.5119726339794755,
+            "recall": 0.6726591760299625,
+            "f1": 0.5814179346066688,
+            "ece": 0.13503870687449138
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5689640445298328,
+          "precision": 0.5126467627470553,
+          "recall": 0.6850856996674342,
+          "f1": 0.5863649601788968,
+          "ece": 0.11856201918032448
+        },
+        "TEST-H": {
+          "pr_auc": 0.5635857416047433,
+          "precision": 0.5004847627546921,
+          "recall": 0.750561797752809,
+          "f1": 0.6004249310485955,
+          "ece": 0.14941140935158093
+        }
+      }
+    },
+    {
+      "seed": 1,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 141,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 7800
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 7800
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 7800
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.635541558265686,
+          "Synchronous/non-critical": 0.4582664668560028,
+          "Asynchronous/critical": 0.39782243967056274,
+          "Asynchronous/non-critical": 0.24580761790275574,
+          "Data/critical": 0.6333697438240051,
+          "Data/non-critical": 0.4544439911842346,
+          "Config/critical": 0.5015711188316345,
+          "Config/non-critical": 0.2455960512161255,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5074900087701864,
+            "precision": 0.2983947119924457,
+            "recall": 0.9552599758162031,
+            "f1": 0.4547416894517197,
+            "ece": 0.4385182590090121
+          },
+          "TEST-H": {
+            "pr_auc": 0.4781476196591252,
+            "precision": 0.28212780898876405,
+            "recall": 0.9375729288214703,
+            "f1": 0.43373819163292854,
+            "ece": 0.4302441847399966
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.4925545942223167,
+            "precision": 0.3088148294222047,
+            "recall": 0.9467956469165659,
+            "f1": 0.4657249070631971,
+            "ece": 0.39389239607617643
+          },
+          "TEST-H": {
+            "pr_auc": 0.45910923599219894,
+            "precision": 0.284058487874465,
+            "recall": 0.9294049008168028,
+            "f1": 0.43512701447691887,
+            "ece": 0.39176354890750464
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5356640397508317,
+            "precision": 0.44560518731988474,
+            "recall": 0.7478839177750907,
+            "f1": 0.5584650112866817,
+            "ece": 0.16337037947124397
+          },
+          "TEST-H": {
+            "pr_auc": 0.5108589842214345,
+            "precision": 0.4551904406273338,
+            "recall": 0.7112018669778296,
+            "f1": 0.5551001821493624,
+            "ece": 0.15594852882840404
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5307250181442592,
+            "precision": 0.5075910931174089,
+            "recall": 0.6064087061668681,
+            "f1": 0.552617079889807,
+            "ece": 0.09451970321341202
+          },
+          "TEST-H": {
+            "pr_auc": 0.528500804521925,
+            "precision": 0.5274599542334096,
+            "recall": 0.5379229871645275,
+            "f1": 0.5326400924321203,
+            "ece": 0.07691754577056507
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.536928315628026,
+          "precision": 0.4723055823944266,
+          "recall": 0.701733172108021,
+          "f1": 0.5644925566185925,
+          "ece": 0.13140370365295911
+        },
+        "TEST-H": {
+          "pr_auc": 0.52307397625519,
+          "precision": 0.4955149671687848,
+          "recall": 0.6201866977829639,
+          "f1": 0.5508398412504102,
+          "ece": 0.10407467252053554
+        }
+      }
+    },
+    {
+      "seed": 2,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 141,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 2396
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 2396
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 2396
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6782044768333435,
+          "Synchronous/non-critical": 0.4826216995716095,
+          "Asynchronous/critical": 0.41953691840171814,
+          "Asynchronous/non-critical": 0.19286032021045685,
+          "Data/critical": 0.6166477203369141,
+          "Data/non-critical": 0.48381170630455017,
+          "Config/critical": 0.34365856647491455,
+          "Config/non-critical": 0.18512701988220215,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5043933950686889,
+            "precision": 0.3523148148148148,
+            "recall": 0.9794079794079794,
+            "f1": 0.5182158665304732,
+            "ece": 0.45725199960651053
+          },
+          "TEST-H": {
+            "pr_auc": 0.5312490630732859,
+            "precision": 0.3466327827191868,
+            "recall": 0.981294964028777,
+            "f1": 0.5123004694835681,
+            "ece": 0.46802618548066577
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5093605145160187,
+            "precision": 0.3551269990592662,
+            "recall": 0.9716859716859717,
+            "f1": 0.5201515673441268,
+            "ece": 0.41938282306055746
+          },
+          "TEST-H": {
+            "pr_auc": 0.5323091600967637,
+            "precision": 0.35515976951283396,
+            "recall": 0.9755395683453237,
+            "f1": 0.5207373271889401,
+            "ece": 0.4318306190509437
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5198487807803731,
+            "precision": 0.4714285714285714,
+            "recall": 0.6795366795366795,
+            "f1": 0.5566684238270954,
+            "ece": 0.15371699319011184
+          },
+          "TEST-H": {
+            "pr_auc": 0.5544441207648025,
+            "precision": 0.49209694415173866,
+            "recall": 0.6719424460431654,
+            "f1": 0.5681265206812651,
+            "ece": 0.16040811853494943
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5249941886088983,
+            "precision": 0.5462962962962963,
+            "recall": 0.4555984555984556,
+            "f1": 0.4968421052631579,
+            "ece": 0.09158814974589419
+          },
+          "TEST-H": {
+            "pr_auc": 0.5468619607756262,
+            "precision": 0.540680473372781,
+            "recall": 0.5258992805755396,
+            "f1": 0.5331874544128373,
+            "ece": 0.09836607947194458
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.520934699955388,
+          "precision": 0.49902070982607993,
+          "recall": 0.6563706563706564,
+          "f1": 0.5666696871711226,
+          "ece": 0.10748951198324835
+        },
+        "TEST-H": {
+          "pr_auc": 0.5573194822587015,
+          "precision": 0.4943702525859717,
+          "recall": 0.6884892086330936,
+          "f1": 0.5743299200546034,
+          "ece": 0.1193127038795188
+        }
+      }
+    },
+    {
+      "seed": 3,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3654
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3654
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3654
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7300909757614136,
+          "Synchronous/non-critical": 0.5122845768928528,
+          "Asynchronous/critical": 0.3951778709888458,
+          "Asynchronous/non-critical": 0.22118864953517914,
+          "Data/critical": 0.6504903435707092,
+          "Data/non-critical": 0.4992682933807373,
+          "Config/critical": 0.3876248598098755,
+          "Config/non-critical": 0.22142294049263,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.48706752635600725,
+            "precision": 0.30376422526991537,
+            "recall": 0.9783834586466166,
+            "f1": 0.46359385437541745,
+            "ece": 0.5053063209408707
+          },
+          "TEST-H": {
+            "pr_auc": 0.5417921291368514,
+            "precision": 0.375736568457539,
+            "recall": 0.9827742520398912,
+            "f1": 0.543630892678034,
+            "ece": 0.4641766625991679
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.45245576823271,
+            "precision": 0.3072146658781786,
+            "recall": 0.9765037593984962,
+            "f1": 0.4673864147548359,
+            "ece": 0.4474856097905702
+          },
+          "TEST-H": {
+            "pr_auc": 0.5145937888413719,
+            "precision": 0.37801047120418846,
+            "recall": 0.9818676337262012,
+            "f1": 0.5458669354838709,
+            "ece": 0.4283377409773633
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5141785506294949,
+            "precision": 0.43734643734643736,
+            "recall": 0.6691729323308271,
+            "f1": 0.5289747399702824,
+            "ece": 0.19501166514640436
+          },
+          "TEST-H": {
+            "pr_auc": 0.5667932485205136,
+            "precision": 0.49170616113744076,
+            "recall": 0.7524932003626473,
+            "f1": 0.5947689000358295,
+            "ece": 0.1855597255189475
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5173156951315412,
+            "precision": 0.4569362261669954,
+            "recall": 0.6531954887218046,
+            "f1": 0.5377176015473889,
+            "ece": 0.16299031634489303
+          },
+          "TEST-H": {
+            "pr_auc": 0.5706878423687429,
+            "precision": 0.4978354978354978,
+            "recall": 0.7298277425203988,
+            "f1": 0.5919117647058825,
+            "ece": 0.1442233547401268
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.503065499066515,
+          "precision": 0.4315635103709665,
+          "recall": 0.6998746867167921,
+          "f1": 0.5331366104739516,
+          "ece": 0.18797343098003702
+        },
+        "TEST-H": {
+          "pr_auc": 0.575309036642664,
+          "precision": 0.488443537561724,
+          "recall": 0.7419159867029315,
+          "f1": 0.5888967985052488,
+          "ece": 0.15392241979023025
+        }
+      }
+    },
+    {
+      "seed": 4,
+      "usable": true,
+      "pool_sizes": {
+        "train": 345,
+        "val": 157,
+        "test": 206
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 1338
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 1338
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 1338
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.771909236907959,
+          "Synchronous/non-critical": 0.5608681440353394,
+          "Asynchronous/critical": 0.4509046673774719,
+          "Asynchronous/non-critical": 0.3011035621166229,
+          "Data/critical": 0.7155986428260803,
+          "Data/non-critical": 0.567426860332489,
+          "Config/critical": 0.5009913444519043,
+          "Config/non-critical": 0.2258601039648056,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5159352018078408,
+            "precision": 0.3593996840442338,
+            "recall": 0.9912854030501089,
+            "f1": 0.527536231884058,
+            "ece": 0.42894714034993553
+          },
+          "TEST-H": {
+            "pr_auc": 0.4927816313961834,
+            "precision": 0.34477124183006536,
+            "recall": 0.9906103286384976,
+            "f1": 0.5115151515151516,
+            "ece": 0.47119440746165564
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5040774526606909,
+            "precision": 0.35889328063241105,
+            "recall": 0.9891067538126361,
+            "f1": 0.5266821345707657,
+            "ece": 0.41712572332610826
+          },
+          "TEST-H": {
+            "pr_auc": 0.4790580214677884,
+            "precision": 0.3448275862068966,
+            "recall": 0.9859154929577465,
+            "f1": 0.5109489051094891,
+            "ece": 0.45717797277985583
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5432669758262791,
+            "precision": 0.513184584178499,
+            "recall": 0.55119825708061,
+            "f1": 0.5315126050420168,
+            "ece": 0.10946917759953413
+          },
+          "TEST-H": {
+            "pr_auc": 0.5128411873099205,
+            "precision": 0.47610294117647056,
+            "recall": 0.607981220657277,
+            "f1": 0.534020618556701,
+            "ece": 0.14741443561322856
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5273638785818018,
+            "precision": 0.46594427244582043,
+            "recall": 0.6557734204793029,
+            "f1": 0.5447963800904978,
+            "ece": 0.14619591516430067
+          },
+          "TEST-H": {
+            "pr_auc": 0.5077601603161643,
+            "precision": 0.4497936726272352,
+            "recall": 0.7676056338028169,
+            "f1": 0.5672159583694708,
+            "ece": 0.17915108392239532
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5673791719154547,
+          "precision": 0.4865378354299239,
+          "recall": 0.6521423384168482,
+          "f1": 0.5558458566382529,
+          "ece": 0.13706355071874862
+        },
+        "TEST-H": {
+          "pr_auc": 0.5301250337155191,
+          "precision": 0.4620666270054798,
+          "recall": 0.7057902973395932,
+          "f1": 0.5580305635061897,
+          "ece": 0.15709575238580684
+        }
+      }
+    },
+    {
+      "seed": 5,
+      "usable": true,
+      "pool_sizes": {
+        "train": 353,
+        "val": 142,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 5022
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 5022
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 5022
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.686259388923645,
+          "Synchronous/non-critical": 0.4079289138317108,
+          "Asynchronous/critical": 0.44351959228515625,
+          "Asynchronous/non-critical": 0.22525715827941895,
+          "Data/critical": 0.5919116735458374,
+          "Data/non-critical": 0.49312102794647217,
+          "Config/critical": 0.45004063844680786,
+          "Config/non-critical": 0.19761879742145538,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5115293351385323,
+            "precision": 0.34369727645215714,
+            "recall": 0.955123911587408,
+            "f1": 0.5054945054945056,
+            "ece": 0.4284643666990834
+          },
+          "TEST-H": {
+            "pr_auc": 0.4826807611458085,
+            "precision": 0.32886577315463095,
+            "recall": 0.9814925373134329,
+            "f1": 0.4926580761162721,
+            "ece": 0.5004929494164109
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5139040242844259,
+            "precision": 0.34863064396743154,
+            "recall": 0.9464166108506363,
+            "f1": 0.5095564370717635,
+            "ece": 0.38943204560477696
+          },
+          "TEST-H": {
+            "pr_auc": 0.485510153929678,
+            "precision": 0.3311845286059629,
+            "recall": 0.9814925373134329,
+            "f1": 0.4952553095345684,
+            "ece": 0.46620065120360593
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5254235692524668,
+            "precision": 0.49159248269040556,
+            "recall": 0.6657736101808439,
+            "f1": 0.5655761024182077,
+            "ece": 0.13926277115306074
+          },
+          "TEST-H": {
+            "pr_auc": 0.515868084670609,
+            "precision": 0.4352773826458037,
+            "recall": 0.7307462686567164,
+            "f1": 0.545576108758636,
+            "ece": 0.21216322670599136
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.526587057196102,
+            "precision": 0.5453226976069616,
+            "recall": 0.5036838580040187,
+            "f1": 0.5236768802228413,
+            "ece": 0.0708990804873309
+          },
+          "TEST-H": {
+            "pr_auc": 0.5193202505610609,
+            "precision": 0.49739039665970775,
+            "recall": 0.568955223880597,
+            "f1": 0.530771372876636,
+            "ece": 0.1173319159725859
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5428277515641136,
+          "precision": 0.5472880711434396,
+          "recall": 0.550569323509712,
+          "f1": 0.5487293435787066,
+          "ece": 0.06075111191364204
+        },
+        "TEST-H": {
+          "pr_auc": 0.5407864360389171,
+          "precision": 0.5035909052857731,
+          "recall": 0.6447761194029851,
+          "f1": 0.5653911266474428,
+          "ece": 0.09779339054124207
+        }
+      }
+    },
+    {
+      "seed": 6,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 141,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4576
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4576
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4576
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7514273524284363,
+          "Synchronous/non-critical": 0.5171316266059875,
+          "Asynchronous/critical": 0.49081042408943176,
+          "Asynchronous/non-critical": 0.24650660157203674,
+          "Data/critical": 0.708503782749176,
+          "Data/non-critical": 0.45942720770835876,
+          "Config/critical": 0.366783082485199,
+          "Config/non-critical": 0.17648005485534668,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5362931799014791,
+            "precision": 0.3738295318127251,
+            "recall": 0.9761755485893417,
+            "f1": 0.540625,
+            "ece": 0.47624758137650525
+          },
+          "TEST-H": {
+            "pr_auc": 0.5445748845267346,
+            "precision": 0.3847075264523857,
+            "recall": 0.9882051282051282,
+            "f1": 0.5538152033338123,
+            "ece": 0.47831331996347404
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5168333379683806,
+            "precision": 0.37834549878345497,
+            "recall": 0.9749216300940439,
+            "f1": 0.5451358457493427,
+            "ece": 0.42829945890096155
+          },
+          "TEST-H": {
+            "pr_auc": 0.5125042283939558,
+            "precision": 0.3875984649565744,
+            "recall": 0.9841025641025641,
+            "f1": 0.5561512824228373,
+            "ece": 0.43155726558780816
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5540990934345148,
+            "precision": 0.4751827626010004,
+            "recall": 0.774294670846395,
+            "f1": 0.5889365760610396,
+            "ece": 0.2073604793473427
+          },
+          "TEST-H": {
+            "pr_auc": 0.5652787121981372,
+            "precision": 0.4705351773902586,
+            "recall": 0.8025641025641026,
+            "f1": 0.5932524639878696,
+            "ece": 0.21189951140890165
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5511931681211639,
+            "precision": 0.47441860465116276,
+            "recall": 0.7673981191222571,
+            "f1": 0.5863473053892216,
+            "ece": 0.17874550333546177
+          },
+          "TEST-H": {
+            "pr_auc": 0.568154120332909,
+            "precision": 0.47194719471947194,
+            "recall": 0.8066666666666666,
+            "f1": 0.5954949839106568,
+            "ece": 0.18454581531257508
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.556456987964317,
+          "precision": 0.4644436363639755,
+          "recall": 0.8089864158829676,
+          "f1": 0.5900670226653638,
+          "ece": 0.21969356251248792
+        },
+        "TEST-H": {
+          "pr_auc": 0.5683001179563872,
+          "precision": 0.4681846893759211,
+          "recall": 0.8362393162393161,
+          "f1": 0.6002676939178082,
+          "ece": 0.22250751954144657
+        }
+      }
+    },
+    {
+      "seed": 7,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4210
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4210
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4210
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6435266733169556,
+          "Synchronous/non-critical": 0.4501059353351593,
+          "Asynchronous/critical": 0.35809773206710815,
+          "Asynchronous/non-critical": 0.21867725253105164,
+          "Data/critical": 0.5978177785873413,
+          "Data/non-critical": 0.5006157159805298,
+          "Config/critical": 0.4179561734199524,
+          "Config/non-critical": 0.21100062131881714,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5783661913565362,
+            "precision": 0.38451443569553806,
+            "recall": 0.9845430107526881,
+            "f1": 0.5530388825972066,
+            "ece": 0.45292840675581375
+          },
+          "TEST-H": {
+            "pr_auc": 0.5308821965605847,
+            "precision": 0.3517296012674941,
+            "recall": 0.9786921381337252,
+            "f1": 0.5174825174825176,
+            "ece": 0.4807617276049709
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5422839764138818,
+            "precision": 0.38778220451527223,
+            "recall": 0.9811827956989247,
+            "f1": 0.5558728345707215,
+            "ece": 0.41254538188637574
+          },
+          "TEST-H": {
+            "pr_auc": 0.5123755973196075,
+            "precision": 0.35495062716840137,
+            "recall": 0.9772226304188097,
+            "f1": 0.5207517619420516,
+            "ece": 0.4420782886832729
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.6021648533391877,
+            "precision": 0.5312947921643574,
+            "recall": 0.7473118279569892,
+            "f1": 0.6210555710695336,
+            "ece": 0.16609904149507398
+          },
+          "TEST-H": {
+            "pr_auc": 0.5530734161888093,
+            "precision": 0.46311475409836067,
+            "recall": 0.7472446730345335,
+            "f1": 0.5718301939836942,
+            "ece": 0.20045875801335852
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.602835255168154,
+            "precision": 0.5671728971962616,
+            "recall": 0.6525537634408602,
+            "f1": 0.6068749999999999,
+            "ece": 0.07663129055761951
+          },
+          "TEST-H": {
+            "pr_auc": 0.5477694003058912,
+            "precision": 0.5145920190589637,
+            "recall": 0.6348273328434975,
+            "f1": 0.5684210526315789,
+            "ece": 0.10668636802453361
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.6035966891386998,
+          "precision": 0.5847893035171899,
+          "recall": 0.5828853046594982,
+          "f1": 0.5827840074461265,
+          "ece": 0.062434570929028176
+        },
+        "TEST-H": {
+          "pr_auc": 0.5543911247659815,
+          "precision": 0.5308458904434513,
+          "recall": 0.5733529267695322,
+          "f1": 0.5500413051576644,
+          "ece": 0.08823042694515548
+        }
+      }
+    },
+    {
+      "seed": 8,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3491
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3491
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3491
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6842079758644104,
+          "Synchronous/non-critical": 0.489379346370697,
+          "Asynchronous/critical": 0.43523600697517395,
+          "Asynchronous/non-critical": 0.2061898112297058,
+          "Data/critical": 0.6611807942390442,
+          "Data/non-critical": 0.5254366993904114,
+          "Config/critical": 0.3549337685108185,
+          "Config/non-critical": 0.19715213775634766,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.4673873039795933,
+            "precision": 0.35621340273259594,
+            "recall": 0.9319148936170213,
+            "f1": 0.5154153918569074,
+            "ece": 0.43315889322247214
+          },
+          "TEST-H": {
+            "pr_auc": 0.5095472409959076,
+            "precision": 0.37675350701402804,
+            "recall": 0.9577874818049491,
+            "f1": 0.5407848777480994,
+            "ece": 0.42511648468918173
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.475263544403766,
+            "precision": 0.3583415597235933,
+            "recall": 0.9268085106382978,
+            "f1": 0.5168485999050783,
+            "ece": 0.4197343951739441
+          },
+          "TEST-H": {
+            "pr_auc": 0.5091971040816393,
+            "precision": 0.3776947398677781,
+            "recall": 0.9563318777292577,
+            "f1": 0.5415207088398929,
+            "ece": 0.4185725268397944
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.4880720364017731,
+            "precision": 0.4850590687977762,
+            "recall": 0.5940425531914894,
+            "f1": 0.5340474368783474,
+            "ece": 0.13216403358920326
+          },
+          "TEST-H": {
+            "pr_auc": 0.5168580091994629,
+            "precision": 0.49665551839464883,
+            "recall": 0.648471615720524,
+            "f1": 0.5625000000000001,
+            "ece": 0.1394961826501348
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.48921781144045706,
+            "precision": 0.4796342477140482,
+            "recall": 0.49106382978723406,
+            "f1": 0.4852817493692178,
+            "ece": 0.08499137612886191
+          },
+          "TEST-H": {
+            "pr_auc": 0.5228541976141263,
+            "precision": 0.5172647257955315,
+            "recall": 0.5560407569141194,
+            "f1": 0.5359522974394949,
+            "ece": 0.0793743059656301
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5170357793157875,
+          "precision": 0.4693340232434026,
+          "recall": 0.6587234042553192,
+          "f1": 0.5463282844641669,
+          "ece": 0.1362056125641569
+        },
+        "TEST-H": {
+          "pr_auc": 0.5236677102342134,
+          "precision": 0.49136500750820095,
+          "recall": 0.7081513828238718,
+          "f1": 0.579317898519645,
+          "ece": 0.14377573761465076
+        }
+      }
+    },
+    {
+      "seed": 9,
+      "usable": true,
+      "pool_sizes": {
+        "train": 324,
+        "val": 130,
+        "test": 254
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 5979
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 5979
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 5979
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7410593628883362,
+          "Synchronous/non-critical": 0.5400040745735168,
+          "Asynchronous/critical": 0.4546939730644226,
+          "Asynchronous/non-critical": 0.303101509809494,
+          "Data/critical": 0.6555494070053101,
+          "Data/non-critical": 0.5466477274894714,
+          "Config/critical": 0.4690583050251007,
+          "Config/non-critical": 0.3517805337905884,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5547416729583649,
+            "precision": 0.35929744177166856,
+            "recall": 0.9681069958847737,
+            "f1": 0.5240879977722083,
+            "ece": 0.47658808714083845
+          },
+          "TEST-H": {
+            "pr_auc": 0.5508370620193843,
+            "precision": 0.38122279008139315,
+            "recall": 0.9843597262952102,
+            "f1": 0.5495974894255696,
+            "ece": 0.47046306771332724
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5382552909373536,
+            "precision": 0.3638132295719844,
+            "recall": 0.9619341563786008,
+            "f1": 0.5279503105590061,
+            "ece": 0.42652006100175976
+          },
+          "TEST-H": {
+            "pr_auc": 0.537381531341339,
+            "precision": 0.3835564053537285,
+            "recall": 0.9804496578690127,
+            "f1": 0.5514018691588785,
+            "ece": 0.4252616900431763
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5781289149078777,
+            "precision": 0.4806701030927835,
+            "recall": 0.7674897119341564,
+            "f1": 0.5911251980982567,
+            "ece": 0.19211011542576495
+          },
+          "TEST-H": {
+            "pr_auc": 0.5739407769158023,
+            "precision": 0.48875885432707117,
+            "recall": 0.7756598240469208,
+            "f1": 0.599659928207066,
+            "ece": 0.1902442535015026
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5715169774811648,
+            "precision": 0.4713643178410794,
+            "recall": 0.808641975308642,
+            "f1": 0.595567342299678,
+            "ece": 0.1870537451710624
+          },
+          "TEST-H": {
+            "pr_auc": 0.5711990581733314,
+            "precision": 0.4907275320970042,
+            "recall": 0.8406647116324536,
+            "f1": 0.6197081606917673,
+            "ece": 0.18635904441096474
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5873305819020102,
+          "precision": 0.5024275973790924,
+          "recall": 0.7232510288065844,
+          "f1": 0.5928358352897655,
+          "ece": 0.14624848134901677
+        },
+        "TEST-H": {
+          "pr_auc": 0.5746176215688122,
+          "precision": 0.5152264925765196,
+          "recall": 0.7370478983382208,
+          "f1": 0.6063979740015052,
+          "ece": 0.1425693879858327
+        }
+      }
+    },
+    {
+      "seed": 10,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 159,
+        "test": 195
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3093
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3093
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3093
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6788402199745178,
+          "Synchronous/non-critical": 0.49852463603019714,
+          "Asynchronous/critical": 0.3708641231060028,
+          "Asynchronous/non-critical": 0.23210053145885468,
+          "Data/critical": 0.5627768039703369,
+          "Data/non-critical": 0.5581606030464172,
+          "Config/critical": 0.5624282360076904,
+          "Config/non-critical": 0.11010423302650452,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.3914439961756886,
+            "precision": 0.2541966426858513,
+            "recall": 0.9325513196480938,
+            "f1": 0.39949748743718594,
+            "ece": 0.49821828789900624
+          },
+          "TEST-H": {
+            "pr_auc": 0.41654458409587647,
+            "precision": 0.25405604719764013,
+            "recall": 0.9609483960948396,
+            "f1": 0.4018664333624964,
+            "ece": 0.5202393984065066
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.41188129816226815,
+            "precision": 0.2562651576394503,
+            "recall": 0.9296187683284457,
+            "f1": 0.4017743979721166,
+            "ece": 0.4808995988360894
+          },
+          "TEST-H": {
+            "pr_auc": 0.42777817289701014,
+            "precision": 0.25624766878030586,
+            "recall": 0.9581589958158996,
+            "f1": 0.4043555032371983,
+            "ece": 0.5046410488254649
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.4165602620916172,
+            "precision": 0.412327311370882,
+            "recall": 0.5689149560117303,
+            "f1": 0.4781269254467037,
+            "ece": 0.17151943641430806
+          },
+          "TEST-H": {
+            "pr_auc": 0.4295220519220672,
+            "precision": 0.4031510658016682,
+            "recall": 0.606694560669456,
+            "f1": 0.4844097995545657,
+            "ece": 0.19043595287121393
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.41919934025415734,
+            "precision": 0.451114922813036,
+            "recall": 0.3856304985337243,
+            "f1": 0.4158102766798419,
+            "ece": 0.11563645988086109
+          },
+          "TEST-H": {
+            "pr_auc": 0.4394547589507772,
+            "precision": 0.4670750382848392,
+            "recall": 0.42538354253835425,
+            "f1": 0.44525547445255476,
+            "ece": 0.12322935231930353
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.42375623738165663,
+          "precision": 0.39505417079727606,
+          "recall": 0.603128054740958,
+          "f1": 0.477293598911372,
+          "ece": 0.17206804321157235
+        },
+        "TEST-H": {
+          "pr_auc": 0.42979336889382713,
+          "precision": 0.39629002320407264,
+          "recall": 0.6336587633658763,
+          "f1": 0.48753848371306246,
+          "ece": 0.1888421906751049
+        }
+      }
+    },
+    {
+      "seed": 11,
+      "usable": false
+    },
+    {
+      "seed": 12,
+      "usable": true,
+      "pool_sizes": {
+        "train": 353,
+        "val": 142,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 6856
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 6856
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 6856
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6511426568031311,
+          "Synchronous/non-critical": 0.4004811644554138,
+          "Asynchronous/critical": 0.37528836727142334,
+          "Asynchronous/non-critical": 0.17276664078235626,
+          "Data/critical": 0.5988798141479492,
+          "Data/non-critical": 0.4003582298755646,
+          "Config/critical": 0.3815770447254181,
+          "Config/non-critical": 0.1297900378704071,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.47338122818847495,
+            "precision": 0.2679166666666667,
+            "recall": 0.9386861313868613,
+            "f1": 0.4168557536466775,
+            "ece": 0.45819342978213906
+          },
+          "TEST-H": {
+            "pr_auc": 0.4610456256114882,
+            "precision": 0.29062305940799005,
+            "recall": 0.9649484536082474,
+            "f1": 0.44670696786509706,
+            "ece": 0.5057604111676297
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.4684934883856697,
+            "precision": 0.2811606946581666,
+            "recall": 0.9335766423357664,
+            "f1": 0.43216759587768205,
+            "ece": 0.4069554307210056
+          },
+          "TEST-H": {
+            "pr_auc": 0.4687261836716249,
+            "precision": 0.29658681365274536,
+            "recall": 0.961512027491409,
+            "f1": 0.4533376539209332,
+            "ece": 0.4660278861185686
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.4890726898234582,
+            "precision": 0.4307692307692308,
+            "recall": 0.7153284671532847,
+            "f1": 0.5377229080932784,
+            "ece": 0.16698968074585516
+          },
+          "TEST-H": {
+            "pr_auc": 0.5028807939390496,
+            "precision": 0.41750705929810406,
+            "recall": 0.711340206185567,
+            "f1": 0.5261820030503305,
+            "ece": 0.19899501763392444
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.49453556030017976,
+            "precision": 0.5203252032520326,
+            "recall": 0.4671532846715329,
+            "f1": 0.49230769230769234,
+            "ece": 0.057985910587230106
+          },
+          "TEST-H": {
+            "pr_auc": 0.5230853912048051,
+            "precision": 0.5432766615146831,
+            "recall": 0.4831615120274914,
+            "f1": 0.5114587122590032,
+            "ece": 0.0597826989497808
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5040463601380981,
+          "precision": 0.5259998658324415,
+          "recall": 0.4554744525547445,
+          "f1": 0.48820156421500904,
+          "ece": 0.04813966421643725
+        },
+        "TEST-H": {
+          "pr_auc": 0.5250691105624372,
+          "precision": 0.5514555165101056,
+          "recall": 0.46414662084765174,
+          "f1": 0.5040390124549315,
+          "ece": 0.058999570332043526
+        }
+      }
+    },
+    {
+      "seed": 13,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 159,
+        "test": 195
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3971
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3971
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3971
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6648279428482056,
+          "Synchronous/non-critical": 0.44464147090911865,
+          "Asynchronous/critical": 0.44946956634521484,
+          "Asynchronous/non-critical": 0.22200720012187958,
+          "Data/critical": 0.5642837285995483,
+          "Data/non-critical": 0.4381280541419983,
+          "Config/critical": 0.48616349697113037,
+          "Config/non-critical": 0.13074427843093872,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5339777650613211,
+            "precision": 0.3897394574268063,
+            "recall": 0.990443686006826,
+            "f1": 0.5593677717810331,
+            "ece": 0.44535383876873724
+          },
+          "TEST-H": {
+            "pr_auc": 0.49278609570628185,
+            "precision": 0.3724057293189126,
+            "recall": 0.9853054911059551,
+            "f1": 0.5405176071277047,
+            "ece": 0.4574469193325027
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5461714727816005,
+            "precision": 0.39309970116816084,
+            "recall": 0.9877133105802047,
+            "f1": 0.5623785464438399,
+            "ece": 0.4173948920848567
+          },
+          "TEST-H": {
+            "pr_auc": 0.5020975567678589,
+            "precision": 0.37385388938183967,
+            "recall": 0.9775715390564579,
+            "f1": 0.5408643560119811,
+            "ece": 0.43214853816251925
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5440143149401693,
+            "precision": 0.5039100684261975,
+            "recall": 0.7037542662116041,
+            "f1": 0.5872970663628595,
+            "ece": 0.14294934205596438
+          },
+          "TEST-H": {
+            "pr_auc": 0.5253304857198862,
+            "precision": 0.47674418604651164,
+            "recall": 0.6024748646558391,
+            "f1": 0.5322856166723609,
+            "ece": 0.14571331346316707
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5367424695637009,
+            "precision": 0.5621742367833209,
+            "recall": 0.515358361774744,
+            "f1": 0.5377492877492878,
+            "ece": 0.06063533666841751
+          },
+          "TEST-H": {
+            "pr_auc": 0.5175670401484965,
+            "precision": 0.5234441602728048,
+            "recall": 0.4748646558391338,
+            "f1": 0.4979724249797242,
+            "ece": 0.0644428574788866
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.535886301106676,
+          "precision": 0.55502096317764,
+          "recall": 0.556769055745165,
+          "f1": 0.5554247734427706,
+          "ece": 0.04440135598741799
+        },
+        "TEST-H": {
+          "pr_auc": 0.5227239347176207,
+          "precision": 0.523668241428887,
+          "recall": 0.4833720030935808,
+          "f1": 0.5023293532347967,
+          "ece": 0.046758667942284345
+        }
+      }
+    },
+    {
+      "seed": 14,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 141,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4340
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4340
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4340
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7254652380943298,
+          "Synchronous/non-critical": 0.48009809851646423,
+          "Asynchronous/critical": 0.4065963923931122,
+          "Asynchronous/non-critical": 0.20708124339580536,
+          "Data/critical": 0.5868002772331238,
+          "Data/non-critical": 0.4784369468688965,
+          "Config/critical": 0.26246410608291626,
+          "Config/non-critical": 0.1431833654642105,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5813620864245763,
+            "precision": 0.40771895101434935,
+            "recall": 0.9909801563439568,
+            "f1": 0.5777388255915863,
+            "ece": 0.4528597929862581
+          },
+          "TEST-H": {
+            "pr_auc": 0.5275974479172009,
+            "precision": 0.3597870182555781,
+            "recall": 0.9902302861130495,
+            "f1": 0.5278036079598288,
+            "ece": 0.4752421849368735
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5502302231807545,
+            "precision": 0.41144141893579816,
+            "recall": 0.9903788334335538,
+            "f1": 0.5813625132368514,
+            "ece": 0.4156287060149254
+          },
+          "TEST-H": {
+            "pr_auc": 0.4830952844047184,
+            "precision": 0.3618657098923629,
+            "recall": 0.9853454291695743,
+            "f1": 0.5293345829428303,
+            "ece": 0.42267102035499016
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.6085806443223655,
+            "precision": 0.5164394546912591,
+            "recall": 0.7745039085989176,
+            "f1": 0.619677652152995,
+            "ece": 0.18054431208542415
+          },
+          "TEST-H": {
+            "pr_auc": 0.5505324929818148,
+            "precision": 0.4689814814814815,
+            "recall": 0.7069085833914864,
+            "f1": 0.5638741998330086,
+            "ece": 0.1815574087838252
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.6073522467966621,
+            "precision": 0.5634625597450876,
+            "recall": 0.6380036079374625,
+            "f1": 0.5984207557811619,
+            "ece": 0.11711103942262413
+          },
+          "TEST-H": {
+            "pr_auc": 0.5541840570702623,
+            "precision": 0.51625,
+            "recall": 0.5764131193300768,
+            "f1": 0.5446752390372568,
+            "ece": 0.12617253252668065
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.6169710272436992,
+          "precision": 0.5368137136745103,
+          "recall": 0.7688915614351574,
+          "f1": 0.6322208603044519,
+          "ece": 0.10770738758089538
+        },
+        "TEST-H": {
+          "pr_auc": 0.5495879330873888,
+          "precision": 0.4905646782509166,
+          "recall": 0.659223075133752,
+          "f1": 0.5625217073836744,
+          "ece": 0.11288465693872429
+        }
+      }
+    },
+    {
+      "seed": 15,
+      "usable": true,
+      "pool_sizes": {
+        "train": 337,
+        "val": 175,
+        "test": 196
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3095
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3095
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3095
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7483835220336914,
+          "Synchronous/non-critical": 0.5457940697669983,
+          "Asynchronous/critical": 0.4985167980194092,
+          "Asynchronous/non-critical": 0.2947787642478943,
+          "Data/critical": 0.7523974776268005,
+          "Data/non-critical": 0.596981942653656,
+          "Config/critical": 0.35872215032577515,
+          "Config/non-critical": 0.19112728536128998,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.47771536068967,
+            "precision": 0.3568173852085524,
+            "recall": 0.9640151515151515,
+            "f1": 0.5208493220772575,
+            "ece": 0.44992811479553074
+          },
+          "TEST-H": {
+            "pr_auc": 0.45247513187738453,
+            "precision": 0.33432638199271764,
+            "recall": 0.9546313799621928,
+            "f1": 0.49521941652365775,
+            "ece": 0.4691931212297136
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.484478910583364,
+            "precision": 0.3583774250440917,
+            "recall": 0.9621212121212122,
+            "f1": 0.522230789000257,
+            "ece": 0.42818329553322954
+          },
+          "TEST-H": {
+            "pr_auc": 0.4532770967916397,
+            "precision": 0.33602965958881026,
+            "recall": 0.94234404536862,
+            "f1": 0.4954037267080745,
+            "ece": 0.43905349131114835
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.4901832013925669,
+            "precision": 0.4601139601139601,
+            "recall": 0.6117424242424242,
+            "f1": 0.5252032520325203,
+            "ece": 0.1691810958942034
+          },
+          "TEST-H": {
+            "pr_auc": 0.47590942568523137,
+            "precision": 0.4294996751137102,
+            "recall": 0.6247637051039697,
+            "f1": 0.5090489025798998,
+            "ece": 0.18758726689354902
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.4865827340087719,
+            "precision": 0.4520383693045564,
+            "recall": 0.7140151515151515,
+            "f1": 0.55359765051395,
+            "ece": 0.17065150617879113
+          },
+          "TEST-H": {
+            "pr_auc": 0.4809939712148313,
+            "precision": 0.4318181818181818,
+            "recall": 0.7183364839319472,
+            "f1": 0.5393896380411639,
+            "ece": 0.19082750988123431
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5163736525127892,
+          "precision": 0.45732858549906874,
+          "recall": 0.7323232323232323,
+          "f1": 0.562915515155161,
+          "ece": 0.16481763454586446
+        },
+        "TEST-H": {
+          "pr_auc": 0.5124221585991364,
+          "precision": 0.441715620567624,
+          "recall": 0.701638311279143,
+          "f1": 0.541967837890693,
+          "ece": 0.17522639108980523
+        }
+      }
+    },
+    {
+      "seed": 16,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4509
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4509
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4509
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6708488464355469,
+          "Synchronous/non-critical": 0.458068311214447,
+          "Asynchronous/critical": 0.4613857865333557,
+          "Asynchronous/non-critical": 0.2494032084941864,
+          "Data/critical": 0.6255137324333191,
+          "Data/non-critical": 0.5142509341239929,
+          "Config/critical": 0.3997439742088318,
+          "Config/non-critical": 0.21545204520225525,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5225190002355532,
+            "precision": 0.354655661594016,
+            "recall": 0.9622113365990203,
+            "f1": 0.5182811911044101,
+            "ece": 0.4493393858377924
+          },
+          "TEST-H": {
+            "pr_auc": 0.45292161423696464,
+            "precision": 0.30153321976149916,
+            "recall": 0.9763593380614657,
+            "f1": 0.4607660840461138,
+            "ece": 0.499213000028115
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5321599137713394,
+            "precision": 0.3630354309888948,
+            "recall": 0.960811756473058,
+            "f1": 0.5269621953559778,
+            "ece": 0.41644081527052873
+          },
+          "TEST-H": {
+            "pr_auc": 0.47627478023511616,
+            "precision": 0.3071944236992781,
+            "recall": 0.9724192277383766,
+            "f1": 0.4668936814226258,
+            "ece": 0.4561951340746808
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.551721089638877,
+            "precision": 0.4816875289754288,
+            "recall": 0.7270818754373688,
+            "f1": 0.5794757389849414,
+            "ece": 0.1560158310674939
+          },
+          "TEST-H": {
+            "pr_auc": 0.46089106777369226,
+            "precision": 0.4212871287128713,
+            "recall": 0.6706067769897557,
+            "f1": 0.5174825174825175,
+            "ece": 0.18865558946680924
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5563651944098995,
+            "precision": 0.5231143552311436,
+            "recall": 0.6018194541637508,
+            "f1": 0.5597136348844778,
+            "ece": 0.09161205260534593
+          },
+          "TEST-H": {
+            "pr_auc": 0.4618328200678528,
+            "precision": 0.4645622394282311,
+            "recall": 0.6146572104018913,
+            "f1": 0.5291723202170963,
+            "ece": 0.12590728346286423
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5692662705511875,
+          "precision": 0.4915540447190904,
+          "recall": 0.7200839748075577,
+          "f1": 0.5840500212249198,
+          "ece": 0.11489550121761422
+        },
+        "TEST-H": {
+          "pr_auc": 0.46930766865039114,
+          "precision": 0.4535370050932597,
+          "recall": 0.7157867086945101,
+          "f1": 0.5551110136182473,
+          "ece": 0.14991743567626722
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 141,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3968
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3968
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3968
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7271743416786194,
+          "Synchronous/non-critical": 0.5878364443778992,
+          "Asynchronous/critical": 0.49300870299339294,
+          "Asynchronous/non-critical": 0.3593713939189911,
+          "Data/critical": 0.6875333786010742,
+          "Data/non-critical": 0.5588570237159729,
+          "Config/critical": 0.3292387127876282,
+          "Config/non-critical": 0.33420199155807495,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5867547898730203,
+            "precision": 0.37387755102040815,
+            "recall": 0.9807280513918629,
+            "f1": 0.541371158392435,
+            "ece": 0.46399816426433504
+          },
+          "TEST-H": {
+            "pr_auc": 0.5341533626316914,
+            "precision": 0.3670392513646998,
+            "recall": 0.9874125874125874,
+            "f1": 0.5351525487966647,
+            "ece": 0.48351851360073594
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5576314023569997,
+            "precision": 0.3774469258340226,
+            "recall": 0.9771591720199857,
+            "f1": 0.5445505171042163,
+            "ece": 0.40877266602230167
+          },
+          "TEST-H": {
+            "pr_auc": 0.5246833701132922,
+            "precision": 0.3720253833950291,
+            "recall": 0.9839160839160839,
+            "f1": 0.5399079048349962,
+            "ece": 0.4328944724525364
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.607197040669246,
+            "precision": 0.5033816425120773,
+            "recall": 0.7437544610992148,
+            "f1": 0.6004033419763756,
+            "ece": 0.18009978274611996
+          },
+          "TEST-H": {
+            "pr_auc": 0.5570687999263279,
+            "precision": 0.4779510022271715,
+            "recall": 0.7503496503496504,
+            "f1": 0.5839455782312926,
+            "ece": 0.19399381993268808
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5706054782466332,
+            "precision": 0.46894539391413087,
+            "recall": 0.8029978586723768,
+            "f1": 0.5921052631578947,
+            "ece": 0.21291853876074687
+          },
+          "TEST-H": {
+            "pr_auc": 0.5161382916714142,
+            "precision": 0.44481981981981983,
+            "recall": 0.8286713286713286,
+            "f1": 0.5788959452857841,
+            "ece": 0.22863846060545368
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.593239818739615,
+          "precision": 0.48387454701777227,
+          "recall": 0.801570306923626,
+          "f1": 0.6034085478557306,
+          "ece": 0.20045375706057156
+        },
+        "TEST-H": {
+          "pr_auc": 0.5364316896846563,
+          "precision": 0.43863721555352425,
+          "recall": 0.8121212121212121,
+          "f1": 0.5695413876827974,
+          "ece": 0.22777826661237702
+        }
+      }
+    },
+    {
+      "seed": 18,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3893
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3893
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3893
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6497273445129395,
+          "Synchronous/non-critical": 0.452724814414978,
+          "Asynchronous/critical": 0.45819398760795593,
+          "Asynchronous/non-critical": 0.22394803166389465,
+          "Data/critical": 0.5384261608123779,
+          "Data/non-critical": 0.4095570743083954,
+          "Config/critical": 0.2846044600009918,
+          "Config/non-critical": 0.20862188935279846,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.6066714597686915,
+            "precision": 0.3882224645583424,
+            "recall": 0.9868329868329868,
+            "f1": 0.5572295049892388,
+            "ece": 0.44731028412267543
+          },
+          "TEST-H": {
+            "pr_auc": 0.5878872205900066,
+            "precision": 0.41484212952293154,
+            "recall": 0.9809264305177112,
+            "f1": 0.5830903790087464,
+            "ece": 0.4529212122430761
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5607906733702118,
+            "precision": 0.3914846557920929,
+            "recall": 0.9812889812889813,
+            "f1": 0.5596837944664033,
+            "ece": 0.3956245677103092
+          },
+          "TEST-H": {
+            "pr_auc": 0.554254957905592,
+            "precision": 0.41674418604651164,
+            "recall": 0.976566757493188,
+            "f1": 0.5841890790546047,
+            "ece": 0.41257077550120824
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.6342166744362541,
+            "precision": 0.5270983213429257,
+            "recall": 0.7616077616077616,
+            "f1": 0.623015873015873,
+            "ece": 0.16755358182083296
+          },
+          "TEST-H": {
+            "pr_auc": 0.6047384806782126,
+            "precision": 0.5105189340813464,
+            "recall": 0.7934604904632152,
+            "f1": 0.6212929379133774,
+            "ece": 0.19240919744918833
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.6253060111684097,
+            "precision": 0.5953177257525084,
+            "recall": 0.6167706167706167,
+            "f1": 0.6058543226684819,
+            "ece": 0.08692130841067906
+          },
+          "TEST-H": {
+            "pr_auc": 0.6036478823142468,
+            "precision": 0.5732360097323601,
+            "recall": 0.6419618528610355,
+            "f1": 0.6056555269922879,
+            "ece": 0.09160331804337933
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.6383036062794207,
+          "precision": 0.6029911541974768,
+          "recall": 0.6133056133056133,
+          "f1": 0.6075927223186176,
+          "ece": 0.056376609870876414
+        },
+        "TEST-H": {
+          "pr_auc": 0.6129444778232253,
+          "precision": 0.5622708797244607,
+          "recall": 0.6766575840145322,
+          "f1": 0.6137760238325966,
+          "ece": 0.07814357187642439
+        }
+      }
+    },
+    {
+      "seed": 19,
+      "usable": true,
+      "pool_sizes": {
+        "train": 353,
+        "val": 142,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3447
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3447
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3447
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6875917315483093,
+          "Synchronous/non-critical": 0.47391489148139954,
+          "Asynchronous/critical": 0.5077638626098633,
+          "Asynchronous/non-critical": 0.19766420125961304,
+          "Data/critical": 0.7154263854026794,
+          "Data/non-critical": 0.4596949815750122,
+          "Config/critical": 0.41146597266197205,
+          "Config/non-critical": 0.1038660928606987,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5178095784997346,
+            "precision": 0.3566234587417009,
+            "recall": 0.9825783972125436,
+            "f1": 0.5233124565066111,
+            "ece": 0.4683664019622421
+          },
+          "TEST-H": {
+            "pr_auc": 0.5219946723534123,
+            "precision": 0.3457911281872162,
+            "recall": 0.9639727361246349,
+            "f1": 0.5089974293059126,
+            "ece": 0.46068944363620634
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5164664951039131,
+            "precision": 0.35931012456084316,
+            "recall": 0.9799651567944251,
+            "f1": 0.5258237906052816,
+            "ece": 0.4507227533639843
+          },
+          "TEST-H": {
+            "pr_auc": 0.5028242535829466,
+            "precision": 0.347949080622348,
+            "recall": 0.9581304771178188,
+            "f1": 0.5105058365758754,
+            "ece": 0.43545531599648385
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5485688008114611,
+            "precision": 0.500314663310258,
+            "recall": 0.6925087108013938,
+            "f1": 0.5809280233832664,
+            "ece": 0.16079214115851093
+          },
+          "TEST-H": {
+            "pr_auc": 0.5425774856375208,
+            "precision": 0.4687294272547729,
+            "recall": 0.6932814021421616,
+            "f1": 0.5593087195600943,
+            "ece": 0.16573946313745308
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5276112908020998,
+            "precision": 0.5266558966074314,
+            "recall": 0.5679442508710801,
+            "f1": 0.5465213746856664,
+            "ece": 0.10965748513206593
+          },
+          "TEST-H": {
+            "pr_auc": 0.5360262376631295,
+            "precision": 0.5187680461982676,
+            "recall": 0.5248296007789679,
+            "f1": 0.5217812197483059,
+            "ece": 0.10367865466649036
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5621714538423753,
+          "precision": 0.4840429613857653,
+          "recall": 0.7639372822299652,
+          "f1": 0.592394097918306,
+          "ece": 0.15453537559384775
+        },
+        "TEST-H": {
+          "pr_auc": 0.559977256085813,
+          "precision": 0.4940025462562492,
+          "recall": 0.67640376501136,
+          "f1": 0.5708622254537031,
+          "ece": 0.12935940805135523
+        }
+      }
+    },
+    {
+      "seed": 20,
+      "usable": true,
+      "pool_sizes": {
+        "train": 353,
+        "val": 142,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 6710
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 6710
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 6710
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7041826844215393,
+          "Synchronous/non-critical": 0.4862639904022217,
+          "Asynchronous/critical": 0.4190349876880646,
+          "Asynchronous/non-critical": 0.1962706595659256,
+          "Data/critical": 0.6786677837371826,
+          "Data/non-critical": 0.46915826201438904,
+          "Config/critical": 0.652099072933197,
+          "Config/non-critical": 0.3813369572162628,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5279046433109298,
+            "precision": 0.3418111753371869,
+            "recall": 0.9790286975717439,
+            "f1": 0.5067123678948872,
+            "ece": 0.4634891855473534
+          },
+          "TEST-H": {
+            "pr_auc": 0.49207347908327315,
+            "precision": 0.3165742024965326,
+            "recall": 0.9640971488912354,
+            "f1": 0.47663795353693555,
+            "ece": 0.48827870877864427
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5053457470512979,
+            "precision": 0.3478517934568388,
+            "recall": 0.9740618101545254,
+            "f1": 0.5126343305257043,
+            "ece": 0.41549361859532924
+          },
+          "TEST-H": {
+            "pr_auc": 0.472623180733512,
+            "precision": 0.3203798136099877,
+            "recall": 0.9619852164730729,
+            "f1": 0.48067537264213167,
+            "ece": 0.4470268723088908
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5494234417451466,
+            "precision": 0.46485411140583555,
+            "recall": 0.7737306843267108,
+            "f1": 0.5807787903893952,
+            "ece": 0.18399632996567228
+          },
+          "TEST-H": {
+            "pr_auc": 0.5142976132717778,
+            "precision": 0.43882807469414037,
+            "recall": 0.7196409714889124,
+            "f1": 0.5452,
+            "ece": 0.19026338205125895
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5582188475785246,
+            "precision": 0.517286084701815,
+            "recall": 0.6605960264900662,
+            "f1": 0.5802229762481822,
+            "ece": 0.1355886899384541
+          },
+          "TEST-H": {
+            "pr_auc": 0.5110662982808936,
+            "precision": 0.47566652560304695,
+            "recall": 0.5934530095036958,
+            "f1": 0.528071411792342,
+            "ece": 0.13276544199014978
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5681390224712914,
+          "precision": 0.49514687063216495,
+          "recall": 0.7772259013980869,
+          "f1": 0.6038740387171766,
+          "ece": 0.15150801581689155
+        },
+        "TEST-H": {
+          "pr_auc": 0.503701580692691,
+          "precision": 0.4480002626794924,
+          "recall": 0.6928898275255192,
+          "f1": 0.5431196329600938,
+          "ece": 0.15587132643130552
+        }
+      }
+    },
+    {
+      "seed": 21,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 1570
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 1570
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 1570
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7201637625694275,
+          "Synchronous/non-critical": 0.5312256217002869,
+          "Asynchronous/critical": 0.48861467838287354,
+          "Asynchronous/non-critical": 0.281352162361145,
+          "Data/critical": 0.7209288477897644,
+          "Data/non-critical": 0.5728834271430969,
+          "Config/critical": 0.3292411267757416,
+          "Config/non-critical": 0.33284151554107666,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.4254991107213343,
+            "precision": 0.3190743338008415,
+            "recall": 0.9763948497854077,
+            "f1": 0.48097251585623685,
+            "ece": 0.5090943464570364
+          },
+          "TEST-H": {
+            "pr_auc": 0.5098776474929774,
+            "precision": 0.3468237704918033,
+            "recall": 0.9589235127478754,
+            "f1": 0.5094055680963131,
+            "ece": 0.48489947443434955
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.43635549554692243,
+            "precision": 0.32237312365975695,
+            "recall": 0.9678111587982833,
+            "f1": 0.48364611260053614,
+            "ece": 0.47387467874747935
+          },
+          "TEST-H": {
+            "pr_auc": 0.5035212229833497,
+            "precision": 0.3497154681841697,
+            "recall": 0.9575070821529745,
+            "f1": 0.5123152709359606,
+            "ece": 0.45038763137038695
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.4426525330373887,
+            "precision": 0.4165651644336175,
+            "recall": 0.7339055793991416,
+            "f1": 0.5314685314685315,
+            "ece": 0.23008252656099143
+          },
+          "TEST-H": {
+            "pr_auc": 0.53222053872966,
+            "precision": 0.4489247311827957,
+            "recall": 0.7096317280453258,
+            "f1": 0.5499451152579583,
+            "ece": 0.19925077623867113
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.44573154936408294,
+            "precision": 0.41784037558685444,
+            "recall": 0.7639484978540773,
+            "f1": 0.5402124430955995,
+            "ece": 0.20127903993721982
+          },
+          "TEST-H": {
+            "pr_auc": 0.5150721781683483,
+            "precision": 0.44956521739130434,
+            "recall": 0.7322946175637394,
+            "f1": 0.5571120689655172,
+            "ece": 0.17793948484260005
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.4629257395083756,
+          "precision": 0.43427969366732727,
+          "recall": 0.6394849785407725,
+          "f1": 0.517170992583932,
+          "ece": 0.15717320144097388
+        },
+        "TEST-H": {
+          "pr_auc": 0.5579961546370108,
+          "precision": 0.4838996687834672,
+          "recall": 0.6831916902738433,
+          "f1": 0.5663440471532538,
+          "ece": 0.15679595832419593
+        }
+      }
+    },
+    {
+      "seed": 22,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 141,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4325
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4325
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4325
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.644934892654419,
+          "Synchronous/non-critical": 0.43198317289352417,
+          "Asynchronous/critical": 0.4369463622570038,
+          "Asynchronous/non-critical": 0.2983609437942505,
+          "Data/critical": 0.5849816203117371,
+          "Data/non-critical": 0.4561442732810974,
+          "Config/critical": 0.30485308170318604,
+          "Config/non-critical": 0.3935376703739166,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5379163057343841,
+            "precision": 0.37306733167082295,
+            "recall": 0.9803407601572739,
+            "f1": 0.5404624277456648,
+            "ece": 0.4742802266475093
+          },
+          "TEST-H": {
+            "pr_auc": 0.5667050343831539,
+            "precision": 0.3975140141359981,
+            "recall": 0.9795795795795795,
+            "f1": 0.5655339805825244,
+            "ece": 0.45452247903729637
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5033763064234014,
+            "precision": 0.37496858507162606,
+            "recall": 0.9777195281782438,
+            "f1": 0.5420526793823797,
+            "ece": 0.43827256254722613
+          },
+          "TEST-H": {
+            "pr_auc": 0.5355996220731085,
+            "precision": 0.3991668708649841,
+            "recall": 0.9783783783783784,
+            "f1": 0.5670031326139924,
+            "ece": 0.41817293770936387
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5535246860011445,
+            "precision": 0.46664034741413346,
+            "recall": 0.7745740498034076,
+            "f1": 0.5824094604582409,
+            "ece": 0.2044861139701626
+          },
+          "TEST-H": {
+            "pr_auc": 0.5934373680159347,
+            "precision": 0.4992205767731878,
+            "recall": 0.7693693693693694,
+            "f1": 0.6055306074214134,
+            "ece": 0.1863610754539462
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5413333442117741,
+            "precision": 0.5207268597387847,
+            "recall": 0.6009174311926605,
+            "f1": 0.5579555825981137,
+            "ece": 0.12031425843693616
+          },
+          "TEST-H": {
+            "pr_auc": 0.5810788681409373,
+            "precision": 0.5487480021310602,
+            "recall": 0.6186186186186187,
+            "f1": 0.5815923207227556,
+            "ece": 0.10210364203509638
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5523036822168114,
+          "precision": 0.492205382630881,
+          "recall": 0.6647007426823941,
+          "f1": 0.5644289293442563,
+          "ece": 0.14440846582713154
+        },
+        "TEST-H": {
+          "pr_auc": 0.5904668838415703,
+          "precision": 0.5275756124812395,
+          "recall": 0.6692692692692693,
+          "f1": 0.5896275525098229,
+          "ece": 0.1203961011870281
+        }
+      }
+    },
+    {
+      "seed": 23,
+      "usable": true,
+      "pool_sizes": {
+        "train": 353,
+        "val": 142,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 5589
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 5589
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 5589
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6651849746704102,
+          "Synchronous/non-critical": 0.46329882740974426,
+          "Asynchronous/critical": 0.3666520118713379,
+          "Asynchronous/non-critical": 0.1971478909254074,
+          "Data/critical": 0.5470501184463501,
+          "Data/non-critical": 0.4651854932308197,
+          "Config/critical": 0.33686089515686035,
+          "Config/non-critical": 0.28231245279312134,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5337092649035162,
+            "precision": 0.3036985986675856,
+            "recall": 0.9538239538239538,
+            "f1": 0.46070744032061334,
+            "ece": 0.45584639634735086
+          },
+          "TEST-H": {
+            "pr_auc": 0.4838768495220714,
+            "precision": 0.2726190476190476,
+            "recall": 0.9331703341483293,
+            "f1": 0.421964252810024,
+            "ece": 0.4472290569349313
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5121664715451081,
+            "precision": 0.3106956933270232,
+            "recall": 0.9473304473304474,
+            "f1": 0.46792587312900924,
+            "ece": 0.41771771085523046
+          },
+          "TEST-H": {
+            "pr_auc": 0.4660975255543498,
+            "precision": 0.27964645224650136,
+            "recall": 0.928280358598207,
+            "f1": 0.42981132075471706,
+            "ece": 0.4076951657797335
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5623894083389307,
+            "precision": 0.47330960854092524,
+            "recall": 0.6717171717171717,
+            "f1": 0.5553235908141962,
+            "ece": 0.14588743681546334
+          },
+          "TEST-H": {
+            "pr_auc": 0.5040590789458537,
+            "precision": 0.43653558984569435,
+            "recall": 0.7147514262428688,
+            "f1": 0.542027194066749,
+            "ece": 0.1671990993662193
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5597387695693867,
+            "precision": 0.5506329113924051,
+            "recall": 0.5021645021645021,
+            "f1": 0.5252830188679245,
+            "ece": 0.054859301038346374
+          },
+          "TEST-H": {
+            "pr_auc": 0.5082905672297087,
+            "precision": 0.5237341772151899,
+            "recall": 0.5395273023634882,
+            "f1": 0.5315134484142915,
+            "ece": 0.08016118114095563
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5734586788913978,
+          "precision": 0.5601164815693699,
+          "recall": 0.5064935064935066,
+          "f1": 0.5318896566833352,
+          "ece": 0.05986075011878119
+        },
+        "TEST-H": {
+          "pr_auc": 0.510073598636408,
+          "precision": 0.5136861652180708,
+          "recall": 0.5332790002716653,
+          "f1": 0.5231514323211107,
+          "ece": 0.08036015450443489
+        }
+      }
+    },
+    {
+      "seed": 24,
+      "usable": true,
+      "pool_sizes": {
+        "train": 351,
+        "val": 147,
+        "test": 210
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4999
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4999
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4999
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6565069556236267,
+          "Synchronous/non-critical": 0.4595988392829895,
+          "Asynchronous/critical": 0.4551915228366852,
+          "Asynchronous/non-critical": 0.2081998735666275,
+          "Data/critical": 0.5697796940803528,
+          "Data/non-critical": 0.4395419955253601,
+          "Config/critical": 0.2828250229358673,
+          "Config/non-critical": 0.22883613407611847,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5532747200081405,
+            "precision": 0.4091481326059589,
+            "recall": 0.9903504316912138,
+            "f1": 0.579064587973274,
+            "ece": 0.4342906120646641
+          },
+          "TEST-H": {
+            "pr_auc": 0.5098022714750515,
+            "precision": 0.37731432219621197,
+            "recall": 0.9916107382550335,
+            "f1": 0.5466317249884384,
+            "ece": 0.4700260393667167
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5538150041682575,
+            "precision": 0.4104951333051206,
+            "recall": 0.9852717115286947,
+            "f1": 0.5795369678864825,
+            "ece": 0.40517880706625903
+          },
+          "TEST-H": {
+            "pr_auc": 0.5155266310301352,
+            "precision": 0.37939160239931446,
+            "recall": 0.9904921700223713,
+            "f1": 0.5486369268897149,
+            "ece": 0.44456113868212377
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5723533000315785,
+            "precision": 0.5293885601577909,
+            "recall": 0.6815642458100558,
+            "f1": 0.5959147424511545,
+            "ece": 0.13755027517291826
+          },
+          "TEST-H": {
+            "pr_auc": 0.529121503870882,
+            "precision": 0.4869293796332423,
+            "recall": 0.697986577181208,
+            "f1": 0.5736612273040681,
+            "ece": 0.16923847793314614
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.558216678248596,
+            "precision": 0.5769230769230769,
+            "recall": 0.5485017775520569,
+            "f1": 0.5623535537620411,
+            "ece": 0.055767350335506526
+          },
+          "TEST-H": {
+            "pr_auc": 0.5255026532059294,
+            "precision": 0.5268875611080934,
+            "recall": 0.5425055928411633,
+            "f1": 0.5345825296224855,
+            "ece": 0.08489656962428434
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5831771495061878,
+          "precision": 0.5440881747411886,
+          "recall": 0.6255290333502624,
+          "f1": 0.5818994923307789,
+          "ece": 0.07022540192687687
+        },
+        "TEST-H": {
+          "pr_auc": 0.5568182497197861,
+          "precision": 0.5208830106289686,
+          "recall": 0.6497017151379568,
+          "f1": 0.5780594723070313,
+          "ece": 0.09140057678217865
+        }
+      }
+    },
+    {
+      "seed": 25,
+      "usable": false
+    },
+    {
+      "seed": 26,
+      "usable": true,
+      "pool_sizes": {
+        "train": 353,
+        "val": 142,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3014
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3014
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3014
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7143014073371887,
+          "Synchronous/non-critical": 0.5522725582122803,
+          "Asynchronous/critical": 0.5189511179924011,
+          "Asynchronous/non-critical": 0.3342491388320923,
+          "Data/critical": 0.6352932453155518,
+          "Data/non-critical": 0.5681073665618896,
+          "Config/critical": 0.44368478655815125,
+          "Config/non-critical": 0.1845754235982895,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.4892168690827492,
+            "precision": 0.331656346749226,
+            "recall": 0.9805491990846682,
+            "f1": 0.4956622325043378,
+            "ece": 0.45721333720872714
+          },
+          "TEST-H": {
+            "pr_auc": 0.5123503127681168,
+            "precision": 0.3411860276198213,
+            "recall": 0.9513023782559457,
+            "f1": 0.5022421524663677,
+            "ece": 0.4233022174701953
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5066522870259247,
+            "precision": 0.33766745468873127,
+            "recall": 0.9805491990846682,
+            "f1": 0.5023446658851114,
+            "ece": 0.43980954264370353
+          },
+          "TEST-H": {
+            "pr_auc": 0.5271999070510367,
+            "precision": 0.34487021013597036,
+            "recall": 0.9479048697621744,
+            "f1": 0.5057401812688821,
+            "ece": 0.40762267173473615
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5008811686969785,
+            "precision": 0.4802804557405784,
+            "recall": 0.6270022883295194,
+            "f1": 0.5439205955334987,
+            "ece": 0.14248733683881692
+          },
+          "TEST-H": {
+            "pr_auc": 0.5294638787117749,
+            "precision": 0.5133079847908745,
+            "recall": 0.6115515288788222,
+            "f1": 0.5581395348837208,
+            "ece": 0.11654963202206006
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5023009927465015,
+            "precision": 0.45131578947368417,
+            "recall": 0.7848970251716247,
+            "f1": 0.5730994152046783,
+            "ece": 0.14895456956171718
+          },
+          "TEST-H": {
+            "pr_auc": 0.534212744720168,
+            "precision": 0.48704663212435234,
+            "recall": 0.7451868629671573,
+            "f1": 0.5890778871978515,
+            "ece": 0.12185983378514947
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5184202381680791,
+          "precision": 0.43379265178493837,
+          "recall": 0.8268497330282227,
+          "f1": 0.5688057464492088,
+          "ece": 0.2285648049344612
+        },
+        "TEST-H": {
+          "pr_auc": 0.5536154206234679,
+          "precision": 0.46857161649864265,
+          "recall": 0.7663269158172895,
+          "f1": 0.5813409231938526,
+          "ece": 0.18214350406309884
+        }
+      }
+    },
+    {
+      "seed": 27,
+      "usable": true,
+      "pool_sizes": {
+        "train": 353,
+        "val": 142,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4672
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4672
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4672
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6827870011329651,
+          "Synchronous/non-critical": 0.46558794379234314,
+          "Asynchronous/critical": 0.37764424085617065,
+          "Asynchronous/non-critical": 0.184544175863266,
+          "Data/critical": 0.5816785097122192,
+          "Data/non-critical": 0.462729275226593,
+          "Config/critical": 0.3964898884296417,
+          "Config/non-critical": 0.1839512437582016,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.513390431394692,
+            "precision": 0.3703099510603589,
+            "recall": 0.9839009287925696,
+            "f1": 0.5380968506603455,
+            "ece": 0.4467306882015442
+          },
+          "TEST-H": {
+            "pr_auc": 0.5534672419501159,
+            "precision": 0.35765124555160144,
+            "recall": 0.9609561752988047,
+            "f1": 0.5212880916360493,
+            "ece": 0.4357467995052777
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5228591210712703,
+            "precision": 0.372737955346651,
+            "recall": 0.9820433436532507,
+            "f1": 0.540374787052811,
+            "ece": 0.42298707290718407
+          },
+          "TEST-H": {
+            "pr_auc": 0.5457000997482733,
+            "precision": 0.36998147004323656,
+            "recall": 0.9545816733067729,
+            "f1": 0.5332739817493879,
+            "ece": 0.40305407168566765
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5271142682703951,
+            "precision": 0.4793859649122807,
+            "recall": 0.676780185758514,
+            "f1": 0.5612323491655968,
+            "ece": 0.15128419271108937
+          },
+          "TEST-H": {
+            "pr_auc": 0.5738165167746979,
+            "precision": 0.4929208180388044,
+            "recall": 0.749003984063745,
+            "f1": 0.5945604048070842,
+            "ece": 0.1600160790688698
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5292717100792841,
+            "precision": 0.5579227696404794,
+            "recall": 0.5188854489164086,
+            "f1": 0.5376965030478024,
+            "ece": 0.0721095474644194
+          },
+          "TEST-H": {
+            "pr_auc": 0.5681717187108959,
+            "precision": 0.5632364493322859,
+            "recall": 0.5713147410358566,
+            "f1": 0.5672468354430379,
+            "ece": 0.06765077095137564
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5514420968221051,
+          "precision": 0.5172434317178466,
+          "recall": 0.6807017543859648,
+          "f1": 0.5877159973350805,
+          "ece": 0.09757789295564351
+        },
+        "TEST-H": {
+          "pr_auc": 0.5769155832512586,
+          "precision": 0.5492862440268661,
+          "recall": 0.6061088977423639,
+          "f1": 0.5758628711939937,
+          "ece": 0.08485502415093595
+        }
+      }
+    },
+    {
+      "seed": 28,
+      "usable": true,
+      "pool_sizes": {
+        "train": 353,
+        "val": 142,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3997
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3997
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3997
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.7260350584983826,
+          "Synchronous/non-critical": 0.5605769753456116,
+          "Asynchronous/critical": 0.5183966755867004,
+          "Asynchronous/non-critical": 0.2998981177806854,
+          "Data/critical": 0.6736657023429871,
+          "Data/non-critical": 0.4969053566455841,
+          "Config/critical": 0.49306032061576843,
+          "Config/non-critical": 0.15535026788711548,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5208904213914837,
+            "precision": 0.3470416556115681,
+            "recall": 0.9931662870159453,
+            "f1": 0.5143531262288636,
+            "ece": 0.4886402529062019
+          },
+          "TEST-H": {
+            "pr_auc": 0.5526090448987617,
+            "precision": 0.3682068470193919,
+            "recall": 0.9588528678304239,
+            "f1": 0.5320878740702301,
+            "ece": 0.4553878758325095
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.49321462497018126,
+            "precision": 0.35081081081081084,
+            "recall": 0.9855732725892179,
+            "f1": 0.5174407016145107,
+            "ece": 0.42800475988040304
+          },
+          "TEST-H": {
+            "pr_auc": 0.5328001028570143,
+            "precision": 0.37420304070622856,
+            "recall": 0.9513715710723192,
+            "f1": 0.537134811686026,
+            "ece": 0.4133499447868984
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5413111517356523,
+            "precision": 0.4610290371879776,
+            "recall": 0.6871678056188307,
+            "f1": 0.551829268292683,
+            "ece": 0.1826452231363174
+          },
+          "TEST-H": {
+            "pr_auc": 0.5660300002615979,
+            "precision": 0.4843627834245504,
+            "recall": 0.7724438902743143,
+            "f1": 0.5953868332532436,
+            "ece": 0.19021975320035267
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5305843934112535,
+            "precision": 0.4432218309859155,
+            "recall": 0.7646165527714502,
+            "f1": 0.5611590972415714,
+            "ece": 0.19850341801587298
+          },
+          "TEST-H": {
+            "pr_auc": 0.5566377771005352,
+            "precision": 0.4676708302718589,
+            "recall": 0.793640897755611,
+            "f1": 0.5885344429033749,
+            "ece": 0.18638692027334045
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5424338541344348,
+          "precision": 0.43995071503091615,
+          "recall": 0.7927107061503417,
+          "f1": 0.5658177248311331,
+          "ece": 0.21179415669083132
+        },
+        "TEST-H": {
+          "pr_auc": 0.5719837018513036,
+          "precision": 0.4662314130633096,
+          "recall": 0.8312551953449709,
+          "f1": 0.5973652957037471,
+          "ece": 0.20403850819313504
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 4263
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 4263
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 4263
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6590833067893982,
+          "Synchronous/non-critical": 0.5061484575271606,
+          "Asynchronous/critical": 0.4019092321395874,
+          "Asynchronous/non-critical": 0.31457117199897766,
+          "Data/critical": 0.6538588404655457,
+          "Data/non-critical": 0.4554688334465027,
+          "Config/critical": 0.39096951484680176,
+          "Config/non-critical": 0.27944353222846985,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5816069142047823,
+            "precision": 0.39259632334424577,
+            "recall": 0.9798868636077939,
+            "f1": 0.5605897159295218,
+            "ece": 0.4683036090145921
+          },
+          "TEST-H": {
+            "pr_auc": 0.5457341252634412,
+            "precision": 0.34588528678304237,
+            "recall": 0.9747013352073085,
+            "f1": 0.5105834713786122,
+            "ece": 0.48379019547569724
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5388031775306397,
+            "precision": 0.3951776649746193,
+            "recall": 0.978629792583281,
+            "f1": 0.5630084975592118,
+            "ece": 0.43585366236210676
+          },
+          "TEST-H": {
+            "pr_auc": 0.5166161003916014,
+            "precision": 0.35001263583522874,
+            "recall": 0.9732958538299368,
+            "f1": 0.5148698884758365,
+            "ece": 0.434890794095857
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.6088182894762049,
+            "precision": 0.5147410358565737,
+            "recall": 0.8120678818353237,
+            "f1": 0.6300902218970983,
+            "ece": 0.19791672851190356
+          },
+          "TEST-H": {
+            "pr_auc": 0.5657992246991485,
+            "precision": 0.4686230248306998,
+            "recall": 0.7294448348559381,
+            "f1": 0.5706432105552502,
+            "ece": 0.18779008588443483
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.6100681731257678,
+            "precision": 0.5211389128559103,
+            "recall": 0.7592708988057826,
+            "f1": 0.6180608851368636,
+            "ece": 0.13441975816731272
+          },
+          "TEST-H": {
+            "pr_auc": 0.5512721552405728,
+            "precision": 0.469284064665127,
+            "recall": 0.7139845397048489,
+            "f1": 0.5663322185061316,
+            "ece": 0.15577403593331637
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.6192531045477433,
+          "precision": 0.5384205163594519,
+          "recall": 0.7339199664781061,
+          "f1": 0.6208823064825114,
+          "ece": 0.14151724869007706
+        },
+        "TEST-H": {
+          "pr_auc": 0.5691306706887208,
+          "precision": 0.4864663100582601,
+          "recall": 0.6980557507613024,
+          "f1": 0.5728197392393799,
+          "ece": 0.15836181852032474
+        }
+      }
+    },
+    {
+      "seed": 30,
+      "usable": true,
+      "pool_sizes": {
+        "train": 357,
+        "val": 138,
+        "test": 213
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 1972
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 1972
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 1972
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.6709760427474976,
+          "Synchronous/non-critical": 0.48429203033447266,
+          "Asynchronous/critical": 0.47541573643684387,
+          "Asynchronous/non-critical": 0.27726101875305176,
+          "Data/critical": 0.6505938768386841,
+          "Data/non-critical": 0.5136690735816956,
+          "Config/critical": 0.3265116512775421,
+          "Config/non-critical": 0.24840490520000458,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5148319160124529,
+            "precision": 0.3731656184486373,
+            "recall": 0.9847856154910097,
+            "f1": 0.5412390725959711,
+            "ece": 0.45160367704066495
+          },
+          "TEST-H": {
+            "pr_auc": 0.5432737545615598,
+            "precision": 0.3914411579609817,
+            "recall": 0.9841772151898734,
+            "f1": 0.5601080594326879,
+            "ece": 0.4384447238047679
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5047649888906242,
+            "precision": 0.373753280839895,
+            "recall": 0.9847856154910097,
+            "f1": 0.5418569254185692,
+            "ece": 0.43956968712697897
+          },
+          "TEST-H": {
+            "pr_auc": 0.5402964674269696,
+            "precision": 0.3921815889029004,
+            "recall": 0.9841772151898734,
+            "f1": 0.5608656447249775,
+            "ece": 0.430523285705956
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.5337466575785212,
+            "precision": 0.4957081545064378,
+            "recall": 0.6390041493775933,
+            "f1": 0.5583081570996978,
+            "ece": 0.14063204283132757
+          },
+          "TEST-H": {
+            "pr_auc": 0.5621847043912912,
+            "precision": 0.5145317545748116,
+            "recall": 0.7563291139240507,
+            "f1": 0.6124279308135809,
+            "ece": 0.14430817660451578
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5228225049436142,
+            "precision": 0.47368421052631576,
+            "recall": 0.5975103734439834,
+            "f1": 0.528440366972477,
+            "ece": 0.11393094266827158
+          },
+          "TEST-H": {
+            "pr_auc": 0.5552161655066937,
+            "precision": 0.5258152173913043,
+            "recall": 0.6123417721518988,
+            "f1": 0.5657894736842105,
+            "ece": 0.10564582974129832
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5379975476915364,
+          "precision": 0.4612571793556388,
+          "recall": 0.7533425541724297,
+          "f1": 0.5715845940482157,
+          "ece": 0.1567080393156504
+        },
+        "TEST-H": {
+          "pr_auc": 0.5708713792614016,
+          "precision": 0.5022066062897315,
+          "recall": 0.7964135021097046,
+          "f1": 0.6157568622259012,
+          "ece": 0.14574202493360533
+        }
+      }
+    },
+    {
+      "seed": 33,
+      "usable": true,
+      "pool_sizes": {
+        "train": 354,
+        "val": 142,
+        "test": 212
+      },
+      "reproduction": {
+        "Reachability (SQL)": {
+          "max_abs_delta": 0.0,
+          "n": 3651
+        },
+        "Depth decay": {
+          "max_abs_delta": 0.0,
+          "n": 3651
+        },
+        "Logistic (path feats)": {
+          "max_abs_delta": 0.0,
+          "n": 3651
+        }
+      },
+      "weight_tables": {
+        "H-IR-noisyOR": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-IR-maxProduct": {
+          "Synchronous/critical": 1.0,
+          "Synchronous/non-critical": 0.8500000238418579,
+          "Asynchronous/critical": 0.75,
+          "Asynchronous/non-critical": 0.550000011920929,
+          "Data/critical": 1.0,
+          "Data/non-critical": 0.8500000238418579,
+          "Config/critical": 0.20000000298023224,
+          "Config/non-critical": 0.20000000298023224,
+          "unknown-type": 0.550000011920929
+        },
+        "H-ORACLE": {
+          "Synchronous/critical": 0.8799999952316284,
+          "Synchronous/non-critical": 0.5199999809265137,
+          "Asynchronous/critical": 0.44999998807907104,
+          "Asynchronous/non-critical": 0.18000000715255737,
+          "Data/critical": 0.699999988079071,
+          "Data/non-critical": 0.47999998927116394,
+          "Config/critical": 0.4000000059604645,
+          "Config/non-critical": 0.15000000596046448,
+          "unknown-type": 0.30000001192092896
+        },
+        "H-FIT (8 params)": {
+          "Synchronous/critical": 0.5752094388008118,
+          "Synchronous/non-critical": 0.5189258456230164,
+          "Asynchronous/critical": 0.49207717180252075,
+          "Asynchronous/non-critical": 0.393154114484787,
+          "Data/critical": 0.5424473285675049,
+          "Data/non-critical": 0.49539753794670105,
+          "Config/critical": 0.4505614936351776,
+          "Config/non-critical": 0.4207441806793213,
+          "unknown-type": 0.5
+        }
+      },
+      "metrics": {
+        "H-IR-noisyOR": {
+          "TEST-R": {
+            "pr_auc": 0.5563226825352768,
+            "precision": 0.3636637541428141,
+            "recall": 0.9781199351701783,
+            "f1": 0.5301998682187569,
+            "ece": 0.4753004877726792
+          },
+          "TEST-H": {
+            "pr_auc": 0.5421259963387961,
+            "precision": 0.36138132295719844,
+            "recall": 0.9750656167979003,
+            "f1": 0.5273243435060326,
+            "ece": 0.46726801434804066
+          }
+        },
+        "H-IR-maxProduct": {
+          "TEST-R": {
+            "pr_auc": 0.5197698259582,
+            "precision": 0.3653438352014541,
+            "recall": 0.9773095623987034,
+            "f1": 0.5318632855567805,
+            "ece": 0.4476265433009472
+          },
+          "TEST-H": {
+            "pr_auc": 0.5040791131654067,
+            "precision": 0.36379267993122083,
+            "recall": 0.9717847769028871,
+            "f1": 0.5294012511170688,
+            "ece": 0.41825829349484434
+          }
+        },
+        "H-ORACLE": {
+          "TEST-R": {
+            "pr_auc": 0.577162318198024,
+            "precision": 0.48295165394402034,
+            "recall": 0.7690437601296597,
+            "f1": 0.5933104095029698,
+            "ece": 0.2001269960001017
+          },
+          "TEST-H": {
+            "pr_auc": 0.5683477670928826,
+            "precision": 0.4774419623302672,
+            "recall": 0.7152230971128609,
+            "f1": 0.5726293669556082,
+            "ece": 0.181597555953294
+          }
+        },
+        "H-FIT (8 params)": {
+          "TEST-R": {
+            "pr_auc": 0.5537463287148388,
+            "precision": 0.49354144241119485,
+            "recall": 0.7431118314424635,
+            "f1": 0.5931435963777489,
+            "ece": 0.15311323113227276
+          },
+          "TEST-H": {
+            "pr_auc": 0.5288328335371015,
+            "precision": 0.46590427784836935,
+            "recall": 0.721784776902887,
+            "f1": 0.5662805662805663,
+            "ece": 0.16542446403457695
+          }
+        }
+      },
+      "scp_gnn_frozen": {
+        "TEST-R": {
+          "pr_auc": 0.5834545044409521,
+          "precision": 0.5100138038496163,
+          "recall": 0.7414910858995137,
+          "f1": 0.6041337137707037,
+          "ece": 0.15892993500899216
+        },
+        "TEST-H": {
+          "pr_auc": 0.5776444918116482,
+          "precision": 0.49429509930206805,
+          "recall": 0.7055993000874891,
+          "f1": 0.5811518146783811,
+          "ece": 0.15579681146654875
+        }
+      }
+    }
+  ]
+}

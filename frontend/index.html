@@ -158,6 +158,19 @@
   .legend { display: flex; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 11px; padding: 0 16px 12px; }
   .legend span { display: inline-flex; align-items: center; gap: 5px; }
   .swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+
+/* --- predicted impact -------------------------------------------------
+   Deliberately a different accent from the SQL cards. Everything else in
+   this dashboard is an observed fact from the database; this one card is
+   an estimate, and it should not look like the others. */
+.pred-row{display:flex;align-items:center;gap:10px;padding:4px 0;flex-wrap:wrap}
+.pred-bar{height:12px;border-radius:6px;background:linear-gradient(90deg,#8b5cf6,#c084fc);min-width:2px}
+.pred-track{flex:0 0 170px;max-width:170px;background:rgba(148,163,184,.15);border-radius:6px;overflow:hidden}
+.pred-pct{font-variant-numeric:tabular-nums;min-width:52px;font-weight:600;color:#c4b5fd}
+.pred-note{border-left:3px solid #8b5cf6;padding:8px 12px;margin-bottom:10px;
+           background:rgba(139,92,246,.08);border-radius:0 6px 6px 0;font-size:13px}
+.pred-edge{font-size:12px;color:var(--muted);padding:2px 0}
+.pred-edge b{color:#c4b5fd}
 </style>
 </head>
 <body>
@@ -280,6 +293,13 @@
       <h2>Blast radius <span class="q">— everything reachable from a failure here</span></h2>
       <div class="card-body" id="blast-chain"></div>
       <div class="sql">GET /components/{id}/blast-radius — recursive CTE in sp_get_blast_radius</div>
+    </section>
+
+    <section class="card" id="card-predicted">
+      <h2>Predicted impact
+        <span class="q">— model estimate of how likely each one actually fails</span></h2>
+      <div class="card-body" id="predicted-body"></div>
+      <div class="sql">GET /components/{id}/blast-radius/predicted — SCP-GNN, trained on synthetic graphs</div>
     </section>
 
     <div class="grid2">
@@ -653,6 +673,9 @@ async function loadExplorer(id) {
         </div>`).join('') + `</div>`;
   }
 
+  // Fire-and-forget: the ML layer is optional and must not block this view.
+  loadPrediction(id);
+
   table($('#tbl-apps'), blast.affected_applications, [
     ['Application', r => esc(r.application_name)],
     ['Type', r => esc(r.app_type)],
@@ -802,6 +825,71 @@ function drawGraph(host, edges, focusId, focusName) {
       </defs>
       ${arrows}${boxes}
     </svg>`;
+}
+
+/**
+ * Predicted impact. Kept separate from loadExplorer's Promise.all on purpose:
+ * the ML layer is optional, and a missing model must cost this one card, not
+ * the whole Dependency Explorer. Every failure path below degrades to an
+ * explanatory message rather than throwing.
+ */
+async function loadPrediction(id) {
+  const body = document.querySelector('#predicted-body');
+  if (!body) return;
+  body.innerHTML = '<div class="empty">Loading prediction…</div>';
+
+  let d;
+  try {
+    const r = await fetch(API + `/components/${id}/blast-radius/predicted`);
+    if (r.status === 503) {
+      const detail = await r.json().catch(() => ({}));
+      body.innerHTML = `<div class="empty">No trained model is loaded.<br><br>
+        <code>${esc(detail.detail || 'Train one with: python -m ml.train_production')}</code>
+        <br><br>The SQL blast radius above is unaffected.</div>`;
+      return;
+    }
+    if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    d = await r.json();
+  } catch (e) {
+    body.innerHTML = `<div class="empty">Prediction unavailable: ${esc(e.message)}.
+      The SQL blast radius above is unaffected.</div>`;
+    return;
+  }
+
+  if (!d.predictions || !d.predictions.length) {
+    body.innerHTML = `<div class="empty">Nothing depends on this component, so there is
+      nothing to predict.</div>`;
+    return;
+  }
+
+  const rows = d.predictions.map(p => `
+    <div class="pred-row">
+      <span class="hop">hop ${num(p.hops_away)}</span>
+      <span class="pred-track"><span class="pred-bar"
+            style="width:${Math.max(2, Math.round(p.predicted_probability * 170))}px"></span></span>
+      <span class="pred-pct">${(p.predicted_probability * 100).toFixed(0)}%</span>
+      <span>${esc(p.component_name)}</span>
+      ${p.above_threshold ? '<span class="pill High">likely</span>'
+                          : '<span class="pill Low">unlikely</span>'}
+    </div>`).join('');
+
+  const edges = (d.edge_transmission || []).slice(0, 5).map(e => `
+    <div class="pred-edge">${esc(e.source_name)} → ${esc(e.target_name)}
+      transmits at <b>${(e.transmission_probability * 100).toFixed(0)}%</b>
+      <span class="mono">${esc(Object.keys(e.dependency_features || {}).join(', '))}</span>
+    </div>`).join('');
+
+  body.innerHTML = `
+    <div class="pred-note">
+      <b>This is a model estimate, not an observation.</b>
+      The ${d.reachable_count} component${d.reachable_count === 1 ? '' : 's'} listed are exactly
+      those the recursive CTE found — the model never adds one. It assigns each a probability,
+      and ${d.predicted_above_threshold} of them clear the ${(d.threshold * 100).toFixed(0)}% threshold.
+      Trained on synthetic graphs, not on this organisation's incidents.
+    </div>
+    ${rows}
+    ${edges ? `<h3 style="margin:14px 0 4px;font-size:13px;color:var(--muted)">
+        Why — per-dependency transmission probability</h3>${edges}` : ''}`;
 }
 
 async function loadGraph() {

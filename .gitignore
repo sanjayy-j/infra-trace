@@ -65,3 +65,8 @@ logs/
 tmp/
 temp/
 *.tmp
+
+# --- ML artifacts: trained models are build output, not source ------
+# Regenerate with: python -m ml.train_production
+ml/artifacts/*.pt
+ml/experiments/results/*.log

@@ -41,7 +41,8 @@ is produced by a recursive SQL query, not by application code.
 5. [Key features](#5-key-features) · 6. [System architecture](#6-system-architecture) ·
 7. [Database architecture](#7-database-architecture) · 8. [ER diagram](#8-er-diagram) ·
 9. [Schema overview](#9-schema-overview) · 10. [Normalisation](#10-normalisation) ·
-11. [SQL capabilities](#11-sql-capabilities) · 12. [Blast-radius analysis](#12-blast-radius-analysis) ·
+11. [SQL capabilities](#11-sql-capabilities) · 12. [Blast-radius analysis](#12-blast-radius-analysis)
+(incl. [predicted blast radius](#predicted-blast-radius-optional-ml-layer)) ·
 13. [Transactions & concurrency](#13-transactions--concurrency) ·
 14. [Query optimisation](#14-query-optimisation) · 15. [Backend](#15-backend) ·
 16. [Frontend](#16-frontend) · 17. [Setup](#17-setup) · 18. [Testing](#18-testing) ·
@@ -292,6 +293,55 @@ not the stopping condition. With the default it covers any estate of fewer than
 An audit found an earlier 50-hop bound silently accepting a 60-node cycle.
 [`tests/sql/06_cycle_regression.sql`](tests/sql/06_cycle_regression.sql) now
 builds that exact scenario and guards against it returning.
+
+### Predicted blast radius (optional ML layer)
+
+The recursive CTE returns everything **reachable** from a failure. That is a
+sound upper bound, but on the 22 recorded incidents it flags 66 components
+where 37 were actually affected — **precision 43.9%, recall 78.4%**. Over half
+of what it would page is noise, because reachability treats a non-critical
+asynchronous dependency exactly like a critical synchronous one. On this data
+those two carry failure 40% and 86% of the time respectively.
+
+`ml/` adds a model that attaches a probability to each reachable component,
+exposed at `GET /components/{id}/blast-radius/predicted` and in the dashboard's
+Dependency Explorer. It never adds or removes a component the SQL found — it
+scores them, and that bound is proved and asserted in the tests.
+
+Three things worth stating plainly, because they are easy to overclaim:
+
+- **The model is not novel.** It is the hyperparametric Independent Cascade
+  model (Kalimeris et al. 2018; applied to cascading failures by Xiang et al.
+  2024). An ablation shows the one difference in this implementation — an MLP
+  instead of a linear link — is worth nothing: 28 parameters match 1,441.
+- **It is not better than simple baselines on this graph.** On the 22 real
+  incidents a one-parameter depth heuristic is competitive. The graph is only
+  3 hops deep, and depth alone nearly separates the classes.
+- **Recall is capped at 78.4% for any method built on this traversal**, because
+  8 of 37 real impacts are unreachable backwards — mostly a caller damaging what
+  it calls. That measurement is the most useful output of the work. Modelling
+  the second direction was then built and measured: it lifts the ceiling to
+  97.3% but grows the candidate set 6× and halves precision, so it improves
+  ranking and worsens F1 and is **not deployed**. It wins only where recall
+  must exceed 95%, which no reverse-only method can reach at all.
+
+It is entirely optional: without torch the API serves its other 27 endpoints
+and these two return 503.
+
+Two follow-up research directions were investigated and **both failed to beat
+the default**, which is reported rather than buried:
+
+| study | hypothesis | outcome |
+|---|---|---|
+| [directionality](docs/ml/direction-study.md) | model failures that travel *forwards* along a dependency | lifts the recall ceiling 78.4% → 97.3% but halves precision; better ranking, worse F1. Wins only above 95% recall, which no reverse-only method can reach |
+| [incomplete graphs](docs/ml/incomplete-graph-study.md) | infer dependencies nobody recorded | loses in all six missing-edge configurations. Candidates grow O(N²) while missing edges grow O(N), so the link-prediction base rate is 2.1% and the trade never pays |
+| [small improvements](docs/ml/parsimony-study.md) | threshold tuning, criticality weighting, uncertainty, prior correction | six candidates, none measurably better. The one surviving result is an *equivalence*: 28 parameters match 1,441, and those 28 coefficients are readable and reproduce the measured transmission rates |
+| [topology realism](docs/ml/topology-study.md) | do these conclusions survive a **real** 708-service production graph? | **partly not.** The "logistic ties the GNN" result is an artefact of degree-homogeneous synthetic graphs: on real topology SCP-GNN wins by +0.034 PR-AUC (p=0.0003, 10/10 seeds) while every conventional GNN degrades. Confirmed against a size- and base-rate-matched control |
+
+**Docs:** [`docs/ml/README.md`](docs/ml/README.md) · design:
+[`docs/ml/design.md`](docs/ml/design.md) · results:
+[`docs/ml/experiments.md`](docs/ml/experiments.md) · prior art:
+[`docs/ml/novelty.md`](docs/ml/novelty.md)
 
 ## 13. Transactions & Concurrency
 

@@ -1,0 +1,16 @@
+# InfraTrace ML layer.
+#
+# Kept SEPARATE from backend/requirements.txt on purpose: the API runs
+# without any of this. If torch is absent, backend/app/main.py mounts the ML
+# router defensively, the two /ml endpoints return 503 with instructions, and
+# the other 27 endpoints are untouched.
+#
+# torch-geometric is deliberately NOT used. The noisy-OR aggregator in
+# ml/models/scp.py has no PyG equivalent, the graphs are small, and the
+# baselines are a few lines each on scatter operations - so the dependency
+# would cost a large install and buy nothing.
+
+torch==2.13.0          # CPU build is sufficient; no GPU code in this package
+numpy==2.5.2
+scikit-learn==1.9.0    # metrics, isotonic calibration, logistic baseline
+scipy==1.18.1          # paired significance tests in the experiment scripts
