@@ -709,21 +709,7 @@ InfraTrace/
 maps every DBMS syllabus topic to the file that implements it and the command
 that demonstrates it.
 
-## 24. Team Contribution
-
-> **TODO before submission** — the names and registration numbers below are
-> placeholders. The work areas are listed so they can be assigned; fill in the
-> first two columns before handing this in.
-
-| Name | Registration number | Work area |
-|---|---|---|
-| *TODO* | *TODO* | Schema design, normalisation, constraints |
-| *TODO* | *TODO* | Analytical SQL, recursive queries, blast radius |
-| *TODO* | *TODO* | Stored programs, triggers, transactions |
-| *TODO* | *TODO* | Backend API, dashboard, testing |
-| *TODO* | *TODO* | Documentation, performance study |
-
-## 25. License
+## 24. License
 
 Released under the **MIT License** — see [`LICENSE`](LICENSE).
 
